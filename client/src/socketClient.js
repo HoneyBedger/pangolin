@@ -2,7 +2,9 @@ import socketIO from 'socket.io-client';
 import config from './config'
 
 export default function() {
-  const socket = socketIO.connect(config.serverHost);
+  const socket = socketIO(config.serverHost, {
+    query: { token: 'token' }
+  });
 
   socket.on('error', function (err) {
     console.log('received socket error:', err);
@@ -16,16 +18,12 @@ export default function() {
     socket.off('message');
   }
 
-  const register = (username, password, name, cb) => {
-    socket.emit('register', username, password, name, cb);
-  };
-
   const login = (username, password, cb) => {
-    socket.emit('enter', username, password, cb);
+    socket.emit('login', username, password, cb);
   };
 
   const logout = (username, cb) => {
-    socket.emit('leave', username, cb);
+    socket.emit('logout', username, cb);
   };
 
   const message = (fromUsername, toUsernames, content, cb) => {
@@ -35,7 +33,6 @@ export default function() {
   return {
     registerHandler,
     unregisterHandler,
-    register,
     login,
     logout,
     message

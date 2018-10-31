@@ -1,31 +1,19 @@
+const authentication = require('../authentication');
 const User = require('../models/users');
 
 module.exports = function (client, clientManager, chatManager) {
 
-  function handleRegister(username, password, name, callback) {
-    console.log("registering a user: ", username, password, name);
-    User.register(new User({ username, name }), password)
-    .then(user => {
-      user.save()
-      .then(userObj => {
-        let { username, name, picture, contacts } = userObj;
-        let user = { username, name, picture, contacts };
-        console.log("registered a user: ", user);
-        clientManager.registerClient(client, user);
-        return callback(null, user);
-      })
-      .catch(err => callback(err.message, null));
-    })
-    .catch(err => callback(err.message, null));
-  }
-
-
   function handleLogin(username, password, callback) {
     console.log(username, " logging in");
-    User.authenticate(username, password)
-    .then(user => {
+    User.authenticate()(username, password)
+    .then(({user, err}) => {
+      if (err) return callback(err.message, null);
+      console.log("user", user);
+      let { username, name, picture, contacts } = user;
+      let token = authentication.getToken({_id: user._id});
+      let result = { username, name, picture, contacts, token};
       console.log("authenticated as user", user);
-      return callback(null, user);
+      return callback(null, result);
     })
     .catch(err => callback(err.message, null));
   }
@@ -47,7 +35,6 @@ module.exports = function (client, clientManager, chatManager) {
   }
 
   return {
-    handleRegister,
     handleLogin,
     handleLogout,
     handleMessage,

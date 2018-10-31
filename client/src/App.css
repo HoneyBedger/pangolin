@@ -1,0 +1,8 @@
+body {
+  background: linear-gradient(#1f253d, #50597b, #11a8ab);
+}
+
+body, input, button {
+  font-family: 'Ubuntu', sans-serif;
+  font-size: 1.2rem;
+}

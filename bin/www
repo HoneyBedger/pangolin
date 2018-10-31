@@ -5,6 +5,7 @@ const app = require('../app');
 const debug = require('debug')('pangolin:server');
 const http = require('http');
 const socketIO = require('socket.io');
+const authentication = require('../authentication');
 const clientManager = require('../socket/clientManager')();
 const chatManager = require('../socket/chatManager')();
 const makeHandlers = require('../socket/handlers');
@@ -16,6 +17,7 @@ app.set('port', port);
 
 // Create HTTP server and WebSocket server.
 var server = http.createServer(app);
+
 const socket = socketIO(server);
 
 // Listen on provided port, on all network interfaces.
@@ -23,18 +25,16 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
-
+socket.use((socket, next) => authentication.verifyUser(socket, next));
 // Listen to WebSocket events
 socket.on('connection', function (client) {
   const {
-    handleRegister,
     handleLogin,
     handleLogout,
     handleMessage,
     handleDisconnect
   } = makeHandlers(client, clientManager, chatManager);
 
-  client.on('register', handleRegister);
   client.on('login', handleLogin);
   client.on('logout', handleLogout);
   client.on('message', handleMessage);

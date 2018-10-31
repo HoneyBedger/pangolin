@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import { ConnectedRouter } from 'connected-react-router';
+import './App.css';
+import PrivateRoute from './components/PrivateRoute';
 import Login from './components/Login';
 import Chat from './components/Chat';
 import { store, history } from './store';
@@ -19,8 +21,18 @@ class App extends Component {
 
   register(username, password, name) {
     this.state.client.register(username, password, name, (err, user) => {
-      if (err) console.log("error registering", err);
+      if (err) {
+        console.log("error registering", err);
+        return;
+      }
       console.log("registered", user);
+      this.state.client.login(username, password, (err, user) => {
+        if (err) {
+          console.log("error logging in", err);
+          return;
+        }
+        console.log("authenticated", user);
+      });
     });
   }
 
@@ -31,8 +43,9 @@ class App extends Component {
           <Switch>
             <Route path="/login" exact
               render={() => <Login register={this.register}/>}/>
-            <Route path="/" exact component={Chat} />
-            <Redirect to="/login" />
+            <PrivateRoute path="/" exact isAuthenticated={() => true}
+              component={Chat} />
+            <Redirect to="/" />
           </Switch>
         </ConnectedRouter>
       </Provider>

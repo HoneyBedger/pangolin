@@ -1,11 +1,7 @@
 import React from 'react';
 import { SignForm, SignGrid, FormHeader, InputGroup, Input,
-  Label, Button } from './Form/Elements';
-import { library } from '@fortawesome/fontawesome-svg-core';
+  Label, ButtonPrimary } from './Form/Elements';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faUnlock } from '@fortawesome/free-solid-svg-icons';
-
-library.add(faEnvelope, faUnlock);
 
 
 const SignIn = (props) => {
@@ -28,7 +24,7 @@ const SignIn = (props) => {
             <Input type="password" id="signinPassword" placeholder="Password"
               ref={(input) => {password = input}} />
           </InputGroup>
-          <Button style={{gridColumn: '2/3'}}>Sign In</Button>
+          <ButtonPrimary style={{gridColumn: '2/3'}}>Sign In</ButtonPrimary>
         </SignGrid>
       </SignForm>
     </div>

@@ -1,8 +1,24 @@
 body {
   background: linear-gradient(#1f253d, #50597b, #11a8ab);
+  color: #9099b7;
 }
 
 body, input, button {
   font-family: 'Ubuntu', sans-serif;
-  font-size: 1.2rem;
+  font-size: 1rem;
+}
+
+#chat, #chat input, #chat button {
+  font-size: 0.9rem;
+}
+
+div::-webkit-scrollbar, textarea::-webkit-scrollbar, ul::-webkit-scrollbar {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 0px;
+  width: 7px;
+}
+
+div::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, ul::-webkit-scrollbar-thumb {
+  background-color: #9099b7;
+  border-radius: 4px;
 }

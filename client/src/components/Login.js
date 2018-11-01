@@ -18,6 +18,7 @@ const mapDispatchToProps = (dispatch) => {
 
 const LoginGrid = styled.section`
   margin-bottom: 50px;
+  min-height: calc(100vh - 91px);
   display: grid;
   justify-items: center;
   justify-content: center;
@@ -34,13 +35,13 @@ class Login extends Component {
 
   render() {
     return (
-      <div>
+      <React.Fragment>
         <Logo/>
         <LoginGrid>
           <SignIn register={this.props.register}/>
           <SignUp />
         </LoginGrid>
-      </div>
+      </React.Fragment>
     );
   }
 }

@@ -19,31 +19,41 @@ const SignGrid = styled.div`
 `;
 
 const InputGroup = styled.div`
+  max-width: 100%;
   display: flex;
   flex-direction: row;
-  align-items: baseline;
+  align-items: flex-end;
   color: #9099b7;
 `;
 
 const Input = styled.input`
-      background-color: rgba(255, 255, 255, 0);
-      margin: 0px 7px;
-      max-width: 90%;
-      border: none;
-      border-bottom: solid 1px #9099b7;
-      box-shadow: 0 8px 6px -6px #50597b;
-      color: #fff;
-      :focus {
-        border-bottom: solid 1px #fff;
-        box-shadow: 0 8px 6px -6px #1f253d;
-        outline: none;
-      }
-      ::placeholder {
-        color: #9099b7;
-      }
-      ::-ms-input-placeholder {
-        color: #9099b7;
-      }
+    background-color: transparent;
+    margin: 0px 7px;
+    width: 90%;
+    border: none;
+    border-bottom: solid 1px #9099b7;
+    box-shadow: 0 8px 6px -6px #50597b;
+    color: #fff;
+    :focus {
+      border-bottom: solid 1px #fff;
+      box-shadow: 0 8px 6px -6px #1f253d;
+      outline: none;
+    }
+    ::placeholder {
+      color: #9099b7;
+    }
+    ::-ms-input-placeholder {
+      color: #9099b7;
+    }
+`;
+
+const SearchInput = styled(Input)`
+  border-bottom: solid 1px #e64c65;
+  box-shadow: none;
+  margin-right: 0px;
+  :focus {
+    box-shadow: none;
+  }
 `;
 
 const Label = styled.label`
@@ -55,15 +65,11 @@ const Label = styled.label`
 
 const Button = styled.button`
   padding: 8px;
-  background-color: #e64c65;
   color: #fff;
-  border: none;
   :hover {
-    background-color: #cc324b;
     cursor: pointer;
   }
   :active {
-    background-color: #cc324b;
     cursor: pointer;
     outline: none;
   }
@@ -72,5 +78,41 @@ const Button = styled.button`
   }
 `;
 
-export { SignForm, SignGrid, FormHeader, InputGroup, Input,
-  Label, Button};
+const ButtonPrimary = styled(Button)`
+  border: none;
+  background-color: #e64c65;
+  :hover {
+    background-color: #cc324b;
+  }
+  :active {
+    background-color: #cc324b;
+  }
+`;
+
+const ButtonOutline = styled(Button)`
+  border: solid 1px #e64c65;
+  background-color: transparent;
+  :hover {
+    border: solid 1px #cc324b;
+  }
+  :active {
+    border: solid 1px #cc324b;
+  }
+`;
+
+const ButtonInvisible = styled(Button)`
+  display: inline;
+  padding-top: 0;
+  padding-bottom: 0;
+  border: none;
+  background-color: transparent;
+  :hover {
+    color: #e64c65;
+  }
+  :active {
+    color: #e64c65;
+  }
+`;
+
+export { SignForm, SignGrid, FormHeader, InputGroup, Input, SearchInput,
+  Label, Button, ButtonPrimary, ButtonOutline, ButtonInvisible };

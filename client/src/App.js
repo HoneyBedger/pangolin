@@ -5,9 +5,17 @@ import { ConnectedRouter } from 'connected-react-router';
 import './App.css';
 import PrivateRoute from './components/PrivateRoute';
 import Login from './components/Login';
-import Chat from './components/Chat';
+import Chat from './components/Chat/Chat';
 import { store, history } from './store';
 import socket from './socketClient';
+
+// Font-awesome icons
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faCog, faSearch, faEnvelope, faUnlock, faUser, faUserCircle, faPlus,
+  faSignOutAlt, faMicrophone, faSmile, faComments, faListUl } from '@fortawesome/free-solid-svg-icons';
+
+library.add(faCog, faSearch, faEnvelope, faUnlock, faUser, faUserCircle,
+  faPlus, faSignOutAlt, faMicrophone, faSmile, faComments, faListUl);
 
 class App extends Component {
 

@@ -1,12 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { SignForm, SignGrid, FormHeader, InputGroup, Input,
-  Label, Button } from './Form/Elements';
-import { library } from '@fortawesome/fontawesome-svg-core';
+  Label, ButtonPrimary } from './Form/Elements';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEnvelope, faUnlock, faUser } from '@fortawesome/free-solid-svg-icons';
-
-library.add(faEnvelope, faUnlock, faUser);
 
 const Prompt = styled.p`
   text-align: right;
@@ -49,7 +45,7 @@ const SignUp = (props) => {
             <Input type="password" id="confirmPassword" placeholder="Password"
               ref={(input) => {confirmPassword = input}} />
           </InputGroup>
-          <Button style={{gridColumn: '2/3'}}>Sign Up</Button>
+          <ButtonPrimary style={{gridColumn: '2/3'}}>Sign Up</ButtonPrimary>
         </SignGrid>
       </SignForm>
     </div>

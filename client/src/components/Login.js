@@ -1,20 +1,23 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { Redirect } from 'react-router-dom';
 import styled from 'styled-components';
-import * as actionCreators from '../actions/actionCreators';
+import { fetchUser } from '../actions/actionCreators';
 import Logo from './Logo';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
+import Loading from './Loading';
 
 const mapStateToProps = (state) => {
   return {
+    user: state.user
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators(actionCreators, dispatch);
-};
+const mapDispatchToProps = (dispatch) => ({
+  fetchUser: (username, password) => dispatch(fetchUser(username, password))
+});
 
 const LoginGrid = styled.section`
   margin-bottom: 50px;
@@ -34,15 +37,23 @@ const LoginGrid = styled.section`
 class Login extends Component {
 
   render() {
-    return (
-      <React.Fragment>
-        <Logo/>
-        <LoginGrid>
-          <SignIn register={this.props.register}/>
-          <SignUp />
-        </LoginGrid>
-      </React.Fragment>
-    );
+    if (this.props.user.user && this.props.user.user.token) {
+      return <Redirect to='/' />;
+    } else  {
+      return (
+        <React.Fragment>
+          {this.props.user.isLoading && <Loading />}
+          <Logo/>
+          <LoginGrid>
+            <SignIn login={(username, password) => {
+                this.props.fetchUser(username, password);
+              }}
+              errMessage={this.props.user.errMessage}/>
+            <SignUp />
+          </LoginGrid>
+        </React.Fragment>
+      );
+    }
   }
 }
 

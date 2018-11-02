@@ -1,26 +1,36 @@
 import socketIO from 'socket.io-client';
-import config from './config'
+import socketActionTypes from './actions/socketActionTypes';
+import { userLoading } from './actions/actionCreators';
 
-export default function() {
-  const socket = socketIO(config.serverHost, {
-    query: { token: 'token' }
+let socket;
+
+export const connectToSocket = (store) => {
+  store.dispatch(userLoading());
+
+  let token = ( store.user && store.user.user && store.user.user.token )
+    || window.localStorage.getItem('userToken');
+  let username = ( store.user && store.user.user && store.user.user.username )
+    || window.localStorage.getItem('username');
+  console.log('connecting to WebSocket with token = ', token);
+  socket = socketIO('/', {
+    autoConnect: false,
+    transportOptions: {
+    polling: {
+      extraHeaders: {
+        'token': token,
+        'username': username
+      }
+    }
+  }
   });
 
-  socket.on('error', function (err) {
-    console.log('received socket error:', err);
-  });
-
-  const registerHandler = (onMessageReceived) => {
-    socket.on('message', onMessageReceived);
-  }
-
-  const unregisterHandler = () => {
-    socket.off('message');
-  }
-
-  const login = (username, password, cb) => {
-    socket.emit('login', username, password, cb);
-  };
+  Object.values(socketActionTypes).forEach(type => socket.on(type, (payload) => {
+    console.log("webSocket received ", type, ' with payload', payload);
+    store.dispatch({
+      type,
+      payload
+    });
+  }));
 
   const logout = (username, cb) => {
     socket.emit('logout', username, cb);
@@ -30,11 +40,7 @@ export default function() {
     socket.emit('message', fromUsername, toUsernames, content, cb);
   };
 
-  return {
-    registerHandler,
-    unregisterHandler,
-    login,
-    logout,
-    message
-  }
-}
+  socket.open();
+};
+
+export const emit = (type, payload) => socket.emit(type, payload);

@@ -7,7 +7,7 @@ import PrivateRoute from './components/PrivateRoute';
 import Login from './components/Login';
 import Chat from './components/Chat/Chat';
 import { store, history } from './store';
-import socket from './socketClient';
+import { connectToSocket } from './socketClient';
 
 // Font-awesome icons
 import { library } from '@fortawesome/fontawesome-svg-core';
@@ -19,7 +19,7 @@ library.add(faCog, faSearch, faEnvelope, faUnlock, faUser, faUserCircle,
 
 class App extends Component {
 
-  constructor(props) {
+  /*constructor(props) {
     super(props);
     this.state = {
       client: socket()
@@ -42,17 +42,16 @@ class App extends Component {
         console.log("authenticated", user);
       });
     });
-  }
+  }*/
 
   render() {
     return (
       <Provider store={store}>
         <ConnectedRouter history={history}>
           <Switch>
-            <Route path="/login" exact
-              render={() => <Login register={this.register}/>}/>
-            <PrivateRoute path="/" exact isAuthenticated={() => true}
-              component={Chat} />
+            <Route path="/login" exact component={Login} />}/>
+            <PrivateRoute path="/" exact component={Chat}
+              connectToSocket={() => connectToSocket(store)} />
             <Redirect to="/" />
           </Switch>
         </ConnectedRouter>

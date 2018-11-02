@@ -1,15 +1,24 @@
 import React from 'react';
+import styled from 'styled-components';
 import { SignForm, SignGrid, FormHeader, InputGroup, Input,
   Label, ButtonPrimary } from './Form/Elements';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+const ErrorMessage = styled.p`
+  text-align: center;
+  color: #ac2a3f;
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-top: 0px;
+`;
 
-const SignIn = (props) => {
+const SignIn = ({ login, errMessage }) => {
   let username, password;
   return (
     <div>
       <FormHeader>Sign In</FormHeader>
       <SignForm>
+        {errMessage && <ErrorMessage>{errMessage}</ErrorMessage>}
         <SignGrid>
           <Label htmlFor="signinEmail">Email</Label>
           <InputGroup>
@@ -24,7 +33,11 @@ const SignIn = (props) => {
             <Input type="password" id="signinPassword" placeholder="Password"
               ref={(input) => {password = input}} />
           </InputGroup>
-          <ButtonPrimary style={{gridColumn: '2/3'}}>Sign In</ButtonPrimary>
+          <ButtonPrimary style={{gridColumn: '2/3'}}
+            onClick={(e) => {
+              e.preventDefault();
+              login(username.value, password.value);
+            }}>Sign In</ButtonPrimary>
         </SignGrid>
       </SignForm>
     </div>

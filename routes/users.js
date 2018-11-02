@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-passport = require('passport');
+const passport = require('passport');
+const authentication = require('../authentication');
 
 const userRouter = express.Router();
 userRouter.use(bodyParser.json());
@@ -28,13 +29,14 @@ userRouter.post('/register', (req, res, next) => {
 //===LOGIN===//
 userRouter.post('/login', passport.authenticate('local'), (req, res, next) => {
   console.log("logging in");
-  if (!req.user) res.status(401).json({err: 'Passport authenticate did not return a user.', result: null});
-  let token = authentication.getToken({_id: req.user._id});
+  if (!req.user)
+    res.status(401).json({ err: 'Passport authenticate did not return a user.', user: null });
+  let token = authentication.getToken({ _id: req.user._id, username: req.user.username });
   console.log("user", req.user);
   let { username, name, picture, contacts } = req.user;
-  let result = { username, name, picture, contacts, token};
+  let user = { username, name, picture, contacts, token};
   console.log("authenticated as user", user);
-  res.status(200).json({err: null, result});
+  res.status(200).json({err: null, user});
 });
 //=================//
 

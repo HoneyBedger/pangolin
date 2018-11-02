@@ -3,19 +3,20 @@ const User = require('../models/users');
 
 module.exports = function (client, clientManager, chatManager) {
 
-  function handleLogin(username, password, callback) {
-    console.log(username, " logging in");
-    User.authenticate()(username, password)
-    .then(({user, err}) => {
-      if (err) return callback(err.message, null);
-      console.log("user", user);
-      let { username, name, picture, contacts } = user;
-      let token = authentication.getToken({_id: user._id});
-      let result = { username, name, picture, contacts, token};
-      console.log("authenticated as user", user);
-      return callback(null, result);
-    })
-    .catch(err => callback(err.message, null));
+
+  const getUser = (username, callback) => {
+    console.log('getting the user after token:', username);
+    User.findOne({ username })
+    .then(res => {
+      if (!res) throw new Error('User not found.');
+      let { username, name, picture, contacts } = res;
+      // Generate a new token since the old one just travelled as a query
+      // string and has to be invalidated
+      let token = authentication.getToken({ _id: res._id, username });
+      let user = { username, name, picture, contacts, token, tokenIsValid: true };
+      console.log('got the user:', user);
+      callback(null, user);
+    }).catch(err => callback(err.message, null));
   }
 
 
@@ -35,7 +36,7 @@ module.exports = function (client, clientManager, chatManager) {
   }
 
   return {
-    handleLogin,
+    getUser,
     handleLogout,
     handleMessage,
     handleDisconnect

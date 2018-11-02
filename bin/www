@@ -27,27 +27,33 @@ server.on('listening', onListening);
 
 socket.use((socket, next) => authentication.verifyUser(socket, next));
 // Listen to WebSocket events
-socket.on('connection', function (client) {
+socket.on('connection', function (socket) {
+
   const {
-    handleLogin,
+    getUser,
     handleLogout,
     handleMessage,
     handleDisconnect
-  } = makeHandlers(client, clientManager, chatManager);
+  } = makeHandlers(socket, clientManager, chatManager);
 
-  client.on('login', handleLogin);
-  client.on('logout', handleLogout);
-  client.on('message', handleMessage);
+  getUser(socket.handshake.headers['username'], (err, res) => {
+    if (err) socket.emit('CONNECTION_TO_SOCKET_FAILED', err);
+    else socket.emit('CONNECTION_TO_SOCKET_SUCCESS', res);
+  });
 
-  client.on('disconnect', function () {
-    console.log('client disconnect...', client.id);
+  socket.on('logout', handleLogout);
+  socket.on('message', handleMessage);
+
+  socket.on('disconnect', function () {
+    console.log('client disconnect...', socket.id);
     handleDisconnect();
   });
 
-  client.on('error', function (err) {
-    console.log('received error from client:', client.id);
+  socket.on('error', function (err) {
+    console.log('received error from client:', socket.id);
     console.log(err);
   });
+
 });
 
 // Normalize a port into a number, string, or false.

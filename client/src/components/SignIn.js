@@ -3,14 +3,8 @@ import styled from 'styled-components';
 import { SignForm, SignGrid, FormHeader, InputGroup, Input,
   Label, ButtonPrimary } from './Form/Elements';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import ErrorMessage from './ErrorMessage';
 
-const ErrorMessage = styled.p`
-  text-align: center;
-  color: #ac2a3f;
-  font-size: 0.9rem;
-  font-weight: bold;
-  margin-top: 0px;
-`;
 
 const SignIn = ({ login, errMessage }) => {
   let username, password;

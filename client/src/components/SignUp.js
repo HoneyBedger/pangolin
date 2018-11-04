@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { SignForm, SignGrid, FormHeader, InputGroup, Input,
   Label, ButtonPrimary } from './Form/Elements';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import ErrorMessage from './ErrorMessage';
 
 const Prompt = styled.p`
   text-align: right;
@@ -17,6 +18,7 @@ const SignUp = (props) => {
     <div>
       <FormHeader>Sign Up</FormHeader>
       <SignForm>
+        <ErrorMessage>{props.errMessage}</ErrorMessage>
         <Prompt>(All fields are required)</Prompt>
         <SignGrid>
           <Label htmlFor="email">Email</Label>
@@ -45,7 +47,11 @@ const SignUp = (props) => {
             <Input type="password" id="confirmPassword" placeholder="Password"
               ref={(input) => {confirmPassword = input}} />
           </InputGroup>
-          <ButtonPrimary style={{gridColumn: '2/3'}}>Sign Up</ButtonPrimary>
+          <ButtonPrimary style={{gridColumn: '2/3'}}
+            onClick={(e) => {
+              e.preventDefault();
+              props.register(username.value, password.value, name.value);
+            }}>Sign Up</ButtonPrimary>
         </SignGrid>
       </SignForm>
     </div>

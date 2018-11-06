@@ -1,6 +1,7 @@
 //===DEPENDENCIES===//
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
+const passportJwt = require('passport-jwt');
 const User = require('./models/users');
 //=================//
 
@@ -10,6 +11,7 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 //===JWT AUTHENTICATION===//
+// for WebSocket
 exports.verifyUser = (socket, next) => {
   let token = socket.handshake.headers['token'];
   let username = socket.handshake.headers['username'];
@@ -17,15 +19,15 @@ exports.verifyUser = (socket, next) => {
     next(new Error('Authentication token and/or username are empty.'));
     return;
   }
-  let tockenPayload;
+  let tokenPayload;
   try {
-    tockenPayload = jwt.verify(token, process.env.JWT_SECRET);
+    tokenPayload = jwt.verify(token, process.env.JWT_SECRET);
   } catch (err) {
     next(err);
     return;
   }
-  console.log('in JWT verification payload is:', tockenPayload);
-  if (tockenPayload.username !== username)
+  console.log('in JWT verification payload is:', tokenPayload);
+  if (tokenPayload.username !== username)
       next(new Error('Authentication token does not belong to user.'));
   else next(); // token appears to be valid
 }
@@ -33,5 +35,26 @@ exports.verifyUser = (socket, next) => {
 exports.getToken = (user) => {
   return jwt.sign(user, process.env.JWT_SECRET, {expiresIn: 60*60*5});
 };
+
+
+// for HTTP
+const ExtractJwt = passportJwt.ExtractJwt;
+const JwtStrategy = passportJwt.Strategy;
+
+exports.jwtPassport = passport.use(new JwtStrategy({
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.JWT_SECRET
+  }, (jwtPayload, next) => {
+    User.findOne({_id: jwtPayload._id})
+    .then((user) => {
+      if (user) {
+        return next(null, user);
+      } else {
+        return next(null, false);
+      }
+    }).catch((err) => next(err));
+}));
+
+exports.verifyUserHTTP = passport.authenticate('jwt', {session: false});
 
 //=================//

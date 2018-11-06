@@ -6,12 +6,14 @@ import rootReducer from './reducers/index';
 
 const history = createBrowserHistory();
 const defaultState = {
-  user: {}
+  user: {},
+  modal: {},
+  contacts: {}
 };
 const store = createStore(
   connectRouter(history)(rootReducer),
   defaultState,
-  compose(applyMiddleware(routerMiddleware(history), thunk),
+  compose(applyMiddleware(routerMiddleware(history), thunk.withExtraArgument()),
     (window.devToolsExtension ? window.devToolsExtension() : f => f))
 );
 

@@ -13,6 +13,7 @@ const ListItem = styled.li`
   flex-direction: row;
   align-items: center;
   flex-wrap: wrap;
+  padding-right: 10px;
   border-bottom: solid 1px #9099b7;
   :hover {
     color: #fff;

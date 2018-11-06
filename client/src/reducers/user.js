@@ -1,15 +1,15 @@
 import actionTypes from '../actions/actionTypes';
 import socketActionTypes from '../actions/socketActionTypes';
 
-const user = (
-  state = {
-    isLoading: false,
-    loginErrMessage: null,
-    registerErrMessage: null,
-    socketErrMessage: null,
-    user: {}
-  }, action
-) => {
+const initialState = {
+  isLoading: false,
+  loginErrMessage: null,
+  registerErrMessage: null,
+  socketErrMessage: null,
+  user: {}
+};
+
+const user = (state = initialState, action) => {
   switch (action.type) {
     case actionTypes.USER_LOADING:
       return { ...state, isLoading: true, registerErrMessage: null, loginErrMessage: null, user: {} };
@@ -35,6 +35,10 @@ const user = (
         ? 'There was a problem with your authentication token. Please log in again.'
         : 'Something went wrong on the server. Please log in and try agan.';
       return { ...state, isLoading: false, socketErrMessage: errMessage, user: {} };
+    case actionTypes.ADD_CONTACT_LOCALLY:
+      let { contacts, ...rest } = state.user;
+      contacts = contacts.concat(action.payload);
+      return { ...state, user: { contacts, ...rest } };
     default:
       return state;
   }

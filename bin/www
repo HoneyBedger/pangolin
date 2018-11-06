@@ -41,6 +41,9 @@ socket.on('connection', function (socket) {
     else socket.emit('CONNECTION_TO_SOCKET_SUCCESS', res);
   });
 
+  socket.on('ADD_CONTACT', (username) => {
+    console.log('Adding contact:', username);
+  });
   socket.on('logout', handleLogout);
   socket.on('message', handleMessage);
 

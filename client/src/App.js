@@ -6,6 +6,7 @@ import './App.css';
 import PrivateRoute from './components/PrivateRoute';
 import Login from './components/Login';
 import Chat from './components/Chat/Chat';
+import Modal from './components/Modal/Modal';
 import { store, history } from './store';
 import { connectToSocket } from './socketClient';
 
@@ -47,14 +48,17 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        <ConnectedRouter history={history}>
-          <Switch>
-            <Route path="/login" exact component={Login} />}/>
-            <PrivateRoute path="/" exact component={Chat}
-              connectToSocket={() => connectToSocket(store)} />
-            <Redirect to="/" />
-          </Switch>
-        </ConnectedRouter>
+        <div>
+          <ConnectedRouter history={history}>
+            <Switch>
+              <Route path="/login" exact component={Login} />}/>
+              <PrivateRoute path="/" exact component={Chat}
+                connectToSocket={() => connectToSocket(store)} />
+              <Redirect to="/" />
+            </Switch>
+          </ConnectedRouter>
+          <Modal/>
+        </div>
       </Provider>
     );
   }

@@ -9,12 +9,13 @@ import ChatHeader from './Header';
 import ChatBody from './ChatBody';
 import AvailableChats from './AvailableChats';
 import Contacts from './Contacts';
-import { user } from '../../fakeData/user';
+//import { user } from '../../fakeData/user';
 import { contacts } from '../../fakeData/contacts';
 import { chats } from '../../fakeData/chats';
 
 const mapStateToProps = (state) => {
   return {
+    user: state.user.user
   };
 };
 
@@ -49,11 +50,13 @@ class Chat extends Component {
         <Logo />
         <ChatGrid>
           <Column>
-            <ChatHeader name={user.name} />
-            <ChatBody chat={chats[1]} contacts={contacts} user={user}/>
+            <ChatHeader name={this.props.user.name} />
+            <ChatBody chat={chats[1]} contacts={contacts} user={this.props.user}/>
           </Column>
-          <AvailableChats chats={chats} contacts={contacts} myUsername={user.username} />
-          <Contacts contacts={contacts} />
+          <AvailableChats chats={chats} contacts={contacts} myUsername={this.props.user.username} />
+          <Contacts contacts={this.props.user.contacts}
+            showModal={this.props.showModal}
+            searchContacts={(searchString, token) => this.props.searchContacts(searchString, token)} />
         </ChatGrid>
       </div>
     );

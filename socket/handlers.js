@@ -7,6 +7,7 @@ module.exports = function (client, clientManager, chatManager) {
   const getUser = (username, callback) => {
     console.log('getting the user after token:', username);
     User.findOne({ username })
+    .populate('contacts')
     .then(res => {
       if (!res) throw new Error('User not found.');
       let { username, name, picture, contacts } = res;

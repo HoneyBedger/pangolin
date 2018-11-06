@@ -1,3 +1,9 @@
+//===CONFIGURE ENVIRONMENT===//
+if (!process.env.NODE_ENV || !process.env.NODE_ENV === 'development')
+  require('dotenv').config();
+//========================//
+
+//===DEPENDENCIES===//
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
@@ -7,13 +13,7 @@ const passport = require('passport');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-
-
-//===CONFIGURE ENVIRONMENT===//
-if (!process.env.NODE_ENV || !process.env.NODE_ENV === 'development')
-  require('dotenv').config();
-//========================//
-
+//==================//
 
 //===CONNECT TO MONGODB===//
 mongoose.connect(process.env.MONGODB_URI)

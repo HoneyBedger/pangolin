@@ -2,13 +2,9 @@ import React from 'react';
 import styled, { keyframes } from 'styled-components';
 
 const LoadingContainer = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 10;
+  position: relative;
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -26,20 +22,20 @@ const Spin = keyframes`
 const Spinner = styled.div`
   display: inline-block;
   position: relative;
-  width: 128px;
-  height: 128px;
+  width: 64px;
+  height: 64px;
   div {
-    transform-origin: 64px 64px;
+    transform-origin: 32px 32px;
     animation: ${Spin} 1.2s linear infinite;
   }
   div:after {
     content: " ";
     display: block;
     position: absolute;
-    top: 0px;
-    left: 59px;
-    width: 10px;
-    height: 28px;
+    top: 3px;
+    left: 29px;
+    width: 5px;
+    height: 14px;
     border-radius: 20%;
     background: #9099b7;
   }
@@ -93,7 +89,7 @@ const Spinner = styled.div`
   }
 `;
 
-const Loading = () => {
+const LoadingSmall = () => {
   return (
     <LoadingContainer>
         <Spinner>
@@ -103,4 +99,4 @@ const Loading = () => {
   );
 }
 
-export default Loading;
+export default LoadingSmall;

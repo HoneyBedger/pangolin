@@ -7,6 +7,32 @@ const User = require('../models/users');
 const userRouter = express.Router();
 userRouter.use(bodyParser.json());
 
+//===GET USERS===//
+userRouter.get('/', authentication.verifyUserHTTP, (req, res, next) => {
+  console.log('fetching users');
+  const removeSensitiveInfo = (users) => {
+    return users.map(user => ({
+      username: user.username,
+      name: user.name,
+      picture: user.picture
+    }));
+  };
+
+  if (req.query.search) {
+    User.find({$text: {$search: req.query.search}}, { score: { $meta: "textScore" } })
+    .sort({ score: { $meta: "textScore" } })
+    .then(users => {
+      console.log('found users', users);
+      res.status(200).json(removeSensitiveInfo(users))
+    })
+    .catch((err) => res.status(500).send('Error quering users.'));
+  } else {
+    User.find(req.query)
+    .then(users => res.status(200).json(removeSensitiveInfo(users)))
+    .catch((err) => res.status(500).send('Error quering users.'));
+  }
+});
+
 //===REGISTER===//
 userRouter.post('/register', (req, res, next) => {
   console.log("registering a user");

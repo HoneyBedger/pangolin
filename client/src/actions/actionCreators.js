@@ -2,11 +2,72 @@ import actionTypes from './actionTypes';
 import socketActionTypes from './socketActionTypes';
 import { connectToSocket } from '../socketClient';
 
-
-export const signupAndLogin = (username, password) => {
+//===MODAL===//
+export const showModal = (modalType, modalProps) => {
   return {
-    type: actionTypes.SIGNUP_AND_LOGIN,
-    payload: {username, password}
+    type: actionTypes.SHOW_MODAL,
+    payload: { modalType, modalProps }
+  };
+};
+
+export const hideModal = () => {
+  return {
+    type: actionTypes.HIDE_MODAL
+  };
+};
+
+//===CONTACTS===//
+export const searchContacts = (searchString, token) => (dispatch) => {
+  console.log('searching contacts with token', token);
+  dispatch(contactsLoading());
+  return fetch(`/users?search=${searchString}`, {
+    headers: { 'Authorization': 'Bearer ' + String(token)}
+  }).then(res => {
+    if (!res.ok) {
+      res.text().then(err => dispatch(contactsLoadingFailed(err)));
+    } else {
+      res.json().then(contacts => dispatch(contactsLoadingSuccess(contacts)));
+    }
+  }).catch(err => dispatch(contactsLoadingFailed(err.message)));
+};
+
+export const addContact = (contact, token) => (dispatch, getState, emit) => {
+  dispatch(addContactLocally(contact));
+  emit('ADD_CONTACT', contact.username);
+};
+
+export const contactsLoading = () => {
+  return {
+    type: actionTypes.CONTACTS_LOADING
+  };
+};
+
+export const contactsLoadingSuccess = (contacts) => {
+  console.log("contacts loaded:", contacts);
+  return {
+    type: actionTypes.CONTACTS_LOADING_SUCCESS,
+    payload: contacts
+  };
+};
+
+export const contactsLoadingFailed = (errMessage) => {
+  console.log("contacts loading failed:", errMessage);
+  return {
+    type: actionTypes.CONTACTS_LOADING_FAILED,
+    payload: errMessage
+  };
+};
+
+export const clearContactSearch = () => {
+  return {
+    type: actionTypes.CLEAR_CONTACT_SEARCH
+  };
+};
+
+export const addContactLocally = (contact) => {
+  return {
+    type: actionTypes.ADD_CONTACT_LOCALLY,
+    payload: contact
   };
 };
 

@@ -14,7 +14,7 @@ const ContactsColumn = styled(Column)`
   }
 `;
 
-const Contacts = ({ contacts }) => {
+const Contacts = ({ contacts, showModal, searchContacts }) => {
   contacts.sort((c1, c2) => {
     if (c1.name === c2.name) return 0;
     return c1.name > c2.name ? 1 : -1;
@@ -29,19 +29,22 @@ const Contacts = ({ contacts }) => {
             <FontAwesomeIcon icon='search' />
           </ButtonPrimary>
         </InputGroup>
-        <ButtonInvisible style={{flex: '1 0 auto'}}>
+        <ButtonInvisible style={{flex: '1 0 auto'}}
+          onClick={(e) => showModal('ADD_CONTACT')}>
           <FontAwesomeIcon icon='plus'/> Add
         </ButtonInvisible>
       </HeaderContainer>
-      <List >
-        {contacts.map(contact => (
-          <ListItem key={contact.username}>
-            <ProfilePicture picture={contact.picture}
-              name={contact.name} online={contact.online}></ProfilePicture>
-            {contact.name}
-          </ListItem>
-        ))}
-      </List>
+      {contacts.length === 0
+        ? <p style={{paddingLeft: '14px', paddingRight: '7px'}}>You do not have any contacts yet.</p>
+        : <List>
+            {contacts.map(contact => (
+              <ListItem key={contact.username}>
+                <ProfilePicture picture={contact.picture}
+                  name={contact.name} online={contact.online}></ProfilePicture>
+                {contact.name}
+              </ListItem> ))}
+          </List>
+        }
     </ContactsColumn>
   );
 };

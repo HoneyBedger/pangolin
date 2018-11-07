@@ -9,7 +9,7 @@ import ChatHeader from './Header';
 import ChatBody from './ChatBody';
 import AvailableChats from './AvailableChats';
 import Contacts from './Contacts';
-//import { user } from '../../fakeData/user';
+import { fakeUser } from '../../fakeData/user';
 import { contacts } from '../../fakeData/contacts';
 import { chats } from '../../fakeData/chats';
 
@@ -45,15 +45,17 @@ const ChatGrid = styled.section`
 class Chat extends Component {
 
   render() {
+    console.log('in chat showModal', this.props.showModal);
     return (
       <div id='chat'>
         <Logo />
         <ChatGrid>
           <Column>
-            <ChatHeader name={this.props.user.name} />
-            <ChatBody chat={chats[1]} contacts={contacts} user={this.props.user}/>
+            <ChatHeader name={this.props.user.name}
+              logout={this.props.logout}/>
+            <ChatBody chat={chats[1]} contacts={contacts} user={fakeUser}/>
           </Column>
-          <AvailableChats chats={chats} contacts={contacts} myUsername={this.props.user.username} />
+          <AvailableChats chats={chats} contacts={contacts} myUsername={fakeUser.username} />
           <Contacts contacts={this.props.user.contacts}
             showModal={this.props.showModal}
             searchContacts={(searchString, token) => this.props.searchContacts(searchString, token)} />

@@ -12,6 +12,12 @@ const ListItem = styled.li`
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
+  >div {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+  }
   flex-wrap: wrap;
   padding-right: 10px;
   border-bottom: solid 1px #9099b7;
@@ -25,4 +31,12 @@ const ListItem = styled.li`
   }
 `;
 
-export { List, ListItem };
+const Badge = styled.p`
+  justify-self: end;
+  background-color: #11a8ab;
+  border-radius: 10px;
+  color: #fff;
+  padding: 5px;
+`;
+
+export { List, ListItem, Badge };

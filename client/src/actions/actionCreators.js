@@ -33,7 +33,7 @@ export const searchContacts = (searchString, token) => (dispatch) => {
 
 export const addContact = (contact, token) => (dispatch, getState, emit) => {
   dispatch(addContactLocally(contact));
-  emit('ADD_CONTACT', contact.username);
+  emit('ADD_CONTACT', { usernameToAdd: contact.username, token});
 };
 
 export const contactsLoading = () => {
@@ -164,3 +164,17 @@ export const userRegisteringFailed = (errMessage) => {
     payload: errMessage
   };
 };
+
+export const logout = () => (dispatch, getState, emit) => {
+  console.log('logging out');
+  emit('LOGOUT');
+  window.localStorage.removeItem('username');
+  window.localStorage.removeItem('userToken');
+  dispatch(logoutLocally());
+};
+
+export const logoutLocally = () => {
+  return {
+    type: actionTypes.LOGOUT_LOCALLY
+  };
+}

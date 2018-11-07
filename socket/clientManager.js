@@ -1,21 +1,22 @@
 module.exports = function () {
   // mapping of all connected clients
-  const clients = new Map()
+  const onlineClients = new Map()
 
-  /*function addClient(client) {
-    clients.set(client.id, { client })
-  }*/
+  const addClient = (socket, username) => {
+    onlineClients.set(username, socket);
+  };
 
-  function registerClient(client, user) {
-    clients.set(client.id, { client, user })
-  }
+  const removeClient = (username) => {
+    onlineClients.delete(username);
+  };
 
-  function removeClient(client) {
-    clients.delete(client.id)
-  }
+  const getClient = (username) => {
+    return onlineClients.get(username);
+  };
 
   return {
-    registerClient,
-    removeClient
-  }
-}
+    addClient,
+    removeClient,
+    getClient
+  };
+};

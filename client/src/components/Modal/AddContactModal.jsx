@@ -63,8 +63,8 @@ const AddContactModal = ({
           {contacts.filter(c => (!existingContacts.includes(c.username)
               && c.username !== myUsername))
             .map(c => (
-              <ListItem key={c.username} style={{justifyContent: 'space-between'}}>
-                <div style={{display: 'flex', alignItems: 'center', marginRight: '10px'}}>
+              <ListItem key={c.username}>
+                <div>
                   <ProfilePicture picture={c.picture} name={c.name} online={c.online}/>
                   {c.name}<br/>{c.username}
                 </div>

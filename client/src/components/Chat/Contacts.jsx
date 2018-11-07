@@ -6,7 +6,7 @@ import HeaderContainer from './HeaderContainer';
 import ProfilePicture from './ProfilePicture';
 import { InputGroup, SearchInput, ButtonPrimary,
   ButtonInvisible } from '../Form/Elements';
-import { List, ListItem } from './ListElements';
+import { List, ListItem, Badge } from './ListElements';
 
 const ContactsColumn = styled(Column)`
   @media (max-width: 991px) {
@@ -39,9 +39,12 @@ const Contacts = ({ contacts, showModal, searchContacts }) => {
         : <List>
             {contacts.map(contact => (
               <ListItem key={contact.username}>
-                <ProfilePicture picture={contact.picture}
-                  name={contact.name} online={contact.online}></ProfilePicture>
-                {contact.name}
+                <div>
+                  <ProfilePicture picture={contact.picture}
+                    name={contact.name} online={contact.online} />
+                  {contact.name}
+                </div>
+                {contact.new && <Badge>new</Badge>}
               </ListItem> ))}
           </List>
         }

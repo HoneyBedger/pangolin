@@ -29,22 +29,27 @@ socket.use((socket, next) => authentication.verifyUser(socket, next));
 // Listen to WebSocket events
 socket.on('connection', function (socket) {
 
+  let username = socket.handshake.headers['username'];
+
   const {
     getUser,
+    handleAddContact,
     handleLogout,
     handleMessage,
     handleDisconnect
-  } = makeHandlers(socket, clientManager, chatManager);
+  } = makeHandlers(username, socket, clientManager, chatManager);
 
-  getUser(socket.handshake.headers['username'], (err, res) => {
+  getUser((err, res) => {
     if (err) socket.emit('CONNECTION_TO_SOCKET_FAILED', err);
-    else socket.emit('CONNECTION_TO_SOCKET_SUCCESS', res);
+    else {
+      clientManager.addClient(socket, username);
+      socket.emit('CONNECTION_TO_SOCKET_SUCCESS', res);
+    }
   });
 
-  socket.on('ADD_CONTACT', (username) => {
-    console.log('Adding contact:', username);
-  });
-  socket.on('logout', handleLogout);
+  socket.on('ADD_CONTACT', handleAddContact);
+
+  socket.on('LOGOUT', handleLogout);
   socket.on('message', handleMessage);
 
   socket.on('disconnect', function () {

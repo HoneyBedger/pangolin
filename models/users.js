@@ -17,7 +17,8 @@ const UserSchema = new Schema({
     required: true
   },
   picture: ImageSchema,
-  contacts: [{type: Schema.Types.ObjectId, ref: 'User'}]
+  contacts: [{type: Schema.Types.ObjectId, ref: 'User'}],
+  newContacts: [{type: Schema.Types.ObjectId, ref: 'User'}]
 });
 
 //automatically add username and password with hashing and salt

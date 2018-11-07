@@ -35,10 +35,19 @@ const user = (state = initialState, action) => {
         ? 'There was a problem with your authentication token. Please log in again.'
         : 'Something went wrong on the server. Please log in and try agan.';
       return { ...state, isLoading: false, socketErrMessage: errMessage, user: {} };
-    case actionTypes.ADD_CONTACT_LOCALLY:
+    case actionTypes.ADD_CONTACT_LOCALLY: {
       let { contacts, ...rest } = state.user;
       contacts = contacts.concat(action.payload);
       return { ...state, user: { contacts, ...rest } };
+    }
+    case socketActionTypes.NEW_CONTACT: {
+      console.log('new contact', action.payload);
+      let { contacts, ...rest } = state.user;
+      contacts = contacts.concat({ ...action.payload, new: true });
+      return { ...state, user: { contacts, ...rest } };
+    }
+    case actionTypes.LOGOUT_LOCALLY:
+      return initialState;
     default:
       return state;
   }

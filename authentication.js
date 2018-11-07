@@ -30,7 +30,18 @@ exports.verifyUser = (socket, next) => {
   if (tokenPayload.username !== username)
       next(new Error('Authentication token does not belong to user.'));
   else next(); // token appears to be valid
-}
+};
+
+exports.tokenOK = (token) => {
+  try {
+    tokenPayload = jwt.verify(token, process.env.JWT_SECRET);
+    console.log('token auth OK');
+    return true;
+  } catch (err) {
+    console.log('token auth failed');
+    return false;
+  }
+};
 
 exports.getToken = (user) => {
   return jwt.sign(user, process.env.JWT_SECRET, {expiresIn: 60*60*5});
@@ -56,5 +67,6 @@ exports.jwtPassport = passport.use(new JwtStrategy({
 }));
 
 exports.verifyUserHTTP = passport.authenticate('jwt', {session: false});
+
 
 //=================//

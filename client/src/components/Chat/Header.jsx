@@ -16,7 +16,8 @@ const ButtonInvisibleHideSmall = styled(ButtonInvisible)`
   }
 `;
 
-const ChatHeader = ({ name }) => {
+const ChatHeader = ({ name, logout }) => {
+  console.log('in header logout', logout);
   return (
     <HeaderContainer>
       <h3 style={{margin: '0 20px', fontWeight: 'normal'}}>{name}</h3>
@@ -30,8 +31,8 @@ const ChatHeader = ({ name }) => {
         <ButtonInvisible>
           <FontAwesomeIcon icon='cog' className='fa-lg'/>
         </ButtonInvisible>
-        <ButtonInvisible>
-          <FontAwesomeIcon icon='sign-out-alt' className='fa-lg'/> Logout
+        <ButtonInvisible onClick={logout}>
+          <FontAwesomeIcon icon='sign-out-alt' className='fa-lg' /> Logout
         </ButtonInvisible>
       </div>
     </HeaderContainer>

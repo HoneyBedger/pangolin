@@ -42,12 +42,12 @@ userRouter.post('/register', (req, res, next) => {
     console.log('saving user');
     user.save()
     .then(userObj => {
-      let { username, name, picture, contacts } = userObj;
       let token = authentication.getToken({
         _id: userObj._id,
         username: userObj.username
       });
-      let user = { username, name, picture, contacts, token };
+      let { username, name } = userObj;
+      let user = { username, name, token };
       console.log("registered a user: ", user);
       return res.status(200).json({err: null, user});
     })
@@ -74,8 +74,8 @@ userRouter.post('/login', passport.authenticate('local'), (req, res, next) => {
     username: req.user.username
   });
   console.log("user", req.user);
-  let { username, name, picture, contacts } = req.user;
-  let user = { username, name, picture, contacts, token};
+  let { username, name } = req.user;
+  let user = { username, name, token};
   console.log("authenticated as user", user);
   res.status(200).json({err: null, user});
 });

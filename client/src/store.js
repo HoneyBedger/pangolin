@@ -8,8 +8,9 @@ import { emit } from './socketClient';
 const history = createBrowserHistory();
 const defaultState = {
   user: {},
+  contacts: [],
   modal: {},
-  contacts: {}
+  searchContacts: {}
 };
 const store = createStore(
   connectRouter(history)(rootReducer),

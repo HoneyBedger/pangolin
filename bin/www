@@ -44,6 +44,11 @@ socket.on('connection', function (socket) {
     else {
       clientManager.addClient(socket, username);
       socket.emit('CONNECTION_TO_SOCKET_SUCCESS', res);
+      res.contacts.forEach(contact => {
+        let contactSocket = clientManager.getClient(contact.username);
+        if (contactSocket)
+          socket.to(`${contactSocket.id}`).emit('CONTACT_ONLINE', res.username);
+      });
     }
   });
 

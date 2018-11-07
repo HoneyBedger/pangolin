@@ -15,7 +15,8 @@ import { chats } from '../../fakeData/chats';
 
 const mapStateToProps = (state) => {
   return {
-    user: state.user.user
+    user: state.user.user,
+    contacts: state.contacts
   };
 };
 
@@ -56,7 +57,7 @@ class Chat extends Component {
             <ChatBody chat={chats[1]} contacts={contacts} user={fakeUser}/>
           </Column>
           <AvailableChats chats={chats} contacts={contacts} myUsername={fakeUser.username} />
-          <Contacts contacts={this.props.user.contacts}
+          <Contacts contacts={this.props.contacts}
             showModal={this.props.showModal}
             searchContacts={(searchString, token) => this.props.searchContacts(searchString, token)} />
         </ChatGrid>

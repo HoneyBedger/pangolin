@@ -47,7 +47,7 @@ module.exports = function (username, client, clientManager, chatManager) {
           let userToAddSocket = clientManager.getClient(usernameToAdd);
           if (userToAddSocket) {
             let { username, name, picture } = user;
-            let contact = { username, name, picture };
+            let contact = { username, name, picture, online: true };
             userToAddSocket.emit('NEW_CONTACT', contact);
           }
         });
@@ -70,6 +70,18 @@ module.exports = function (username, client, clientManager, chatManager) {
   function handleDisconnect() {
     console.log(username, ' disconnected');
     clientManager.removeClient(client);
+    User.findOne({ username })
+    .populate('contacts')
+    .then(user => {
+      console.log('notifying contacts of', user);
+      user.contacts.forEach(contact => {
+        console.log('notifying', contact.username);
+        let contactSocket = clientManager.getClient(contact.username);
+        if (contactSocket)
+          console.log(contact.username, ' is online');
+          contactSocket.emit('CONTACT_OFFLINE', username);
+      })
+    }).catch(err => console.log('In DISCONNECT Error: ', err.message));
   }
 
   return {

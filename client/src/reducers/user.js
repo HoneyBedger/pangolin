@@ -24,7 +24,9 @@ const user = (state = initialState, action) => {
     case actionTypes.USER_REGISTERING_FAILED:
       return { ...state, isLoading: false, registerErrMessage: action.payload, user: {} };
     case socketActionTypes.CONNECTION_TO_SOCKET_SUCCESS:
-      return { ...state, isLoading: false, socketErrMessage: null, user: action.payload };
+      return { ...state, isLoading: false, socketErrMessage: null,
+        user: { username: action.payload.username, name: action.payload.name,
+          picture: action.payload.picture, token: action.payload.token, tokenIsValid: action.payload.tokenIsValid } };
     case socketActionTypes.CONNECTION_TO_SOCKET_FAILED:
       return { ...state, isLoading: false, socketErrMessage: action.payload, user: {} };
     case socketActionTypes.SOCKET_ERROR:
@@ -35,17 +37,7 @@ const user = (state = initialState, action) => {
         ? 'There was a problem with your authentication token. Please log in again.'
         : 'Something went wrong on the server. Please log in and try agan.';
       return { ...state, isLoading: false, socketErrMessage: errMessage, user: {} };
-    case actionTypes.ADD_CONTACT_LOCALLY: {
-      let { contacts, ...rest } = state.user;
-      contacts = contacts.concat(action.payload);
-      return { ...state, user: { contacts, ...rest } };
-    }
-    case socketActionTypes.NEW_CONTACT: {
-      console.log('new contact', action.payload);
-      let { contacts, ...rest } = state.user;
-      contacts = contacts.concat({ ...action.payload, new: true });
-      return { ...state, user: { contacts, ...rest } };
-    }
+
     case actionTypes.LOGOUT_LOCALLY:
       return initialState;
     default:

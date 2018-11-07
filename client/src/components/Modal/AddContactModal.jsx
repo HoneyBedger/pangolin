@@ -13,10 +13,10 @@ import ProfilePicture from '../Chat/ProfilePicture';
 const mapStateToProps = (state) => {
   let user = state.user.user;
   return {
-    ...state.contacts,
+    ...state.searchContacts,
     myUsername: user && user.username,
     token: user && user.token,
-    existingContacts: user && user.contacts.map(c => c.username)
+    existingContacts: state.contacts.map(c => c.username)
   };
 };
 

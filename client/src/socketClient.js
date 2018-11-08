@@ -43,4 +43,4 @@ export const connectToSocket = (store) => {
   socket.open();
 };
 
-export const emit = (type, payload) => socket.emit(type, payload);
+export const emit = (type, payload, callback) => socket.emit(type, payload, callback);

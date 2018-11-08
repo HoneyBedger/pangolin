@@ -5,18 +5,15 @@ const passportLocalMongoose = require('passport-local-mongoose');
 
 const Schema = mongoose.Schema;
 
-const ImageSchema = new Schema({
-  type: String,
-  data: Buffer
-});
-
-
 const UserSchema = new Schema({
   name: {
     type: String,
     required: true
   },
-  picture: ImageSchema,
+  picture: new mongoose.Schema({
+    data: String,
+    type: String
+  }), //base64 encoded
   contacts: [{type: Schema.Types.ObjectId, ref: 'User'}],
   newContacts: [{type: Schema.Types.ObjectId, ref: 'User'}]
 });

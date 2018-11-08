@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const authentication = require('../authentication');
 const User = require('../models/users');
+const clientManager = require('../socket/clientManager');
 
 const userRouter = express.Router();
 userRouter.use(bodyParser.json());
@@ -21,14 +22,30 @@ userRouter.get('/', authentication.verifyUserHTTP, (req, res, next) => {
   if (req.query.search) {
     User.find({$text: {$search: req.query.search}}, { score: { $meta: "textScore" } })
     .sort({ score: { $meta: "textScore" } })
+    .select('username name picture')
+    .lean()
     .then(users => {
+      for (let user of users) {
+        if (clientManager.getClient(user.username)){
+          console.log(user.username, ' is online');
+          user.online = true;
+        }
+      }
       console.log('found users', users);
-      res.status(200).json(removeSensitiveInfo(users))
+      res.status(200).json(users);
     })
     .catch((err) => res.status(500).send('Error quering users.'));
   } else {
     User.find(req.query)
-    .then(users => res.status(200).json(removeSensitiveInfo(users)))
+    .select('username name picture')
+    .lean()
+    .then(users => {
+      for (let user of users) {
+        if (clientManager.getClient(user.username))
+          user.online = true;
+      }
+      res.status(200).json(users);
+    })
     .catch((err) => res.status(500).send('Error quering users.'));
   }
 });

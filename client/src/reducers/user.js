@@ -6,6 +6,9 @@ const initialState = {
   loginErrMessage: null,
   registerErrMessage: null,
   socketErrMessage: null,
+  pictureWarning: null,
+  pictureErrMessage: null,
+  pictureIsLoading: false,
   user: {}
 };
 
@@ -37,6 +40,15 @@ const user = (state = initialState, action) => {
         ? 'There was a problem with your authentication token. Please log in again.'
         : 'Something went wrong on the server. Please log in and try agan.';
       return { ...state, isLoading: false, socketErrMessage: errMessage, user: {} };
+
+    case actionTypes.UPLOAD_PICTURE_WARNING:
+      return { ...state, pictureWarning: action.payload };
+    case actionTypes.UPLOAD_PICTURE_INPROGRESS:
+      return { ...state, pictureIsLoading: true, pictureWarning: null, pictureErrMessage: null };
+    case socketActionTypes.UPLOAD_PICTURE_SUCCESS:
+      return { ...state, user: { ...state.user, picture: action.payload }, pictureIsLoading: false };
+    case socketActionTypes.UPLOAD_PICTURE_FAILED:
+      return { ...state, pictureIsLoading: false, pictureErrMessage: action.payload };
 
     case actionTypes.LOGOUT_LOCALLY:
       return initialState;

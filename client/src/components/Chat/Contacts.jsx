@@ -14,23 +14,31 @@ const ContactsColumn = styled(Column)`
   }
 `;
 
-const Contacts = ({ contacts, showModal, searchContacts }) => {
+const Contacts = ({ contacts, showModal, searchContacts, searchExistingContacts }) => {
   contacts.sort((c1, c2) => {
     if (c1.name === c2.name) return 0;
     return c1.name > c2.name ? 1 : -1;
   });
 
+  let searchInput;
+  const search = () => {
+    if (searchInput)
+      searchExistingContacts(searchInput.value);
+  };
+
   return (
     <ContactsColumn>
       <HeaderContainer>
         <InputGroup>
-          <SearchInput placeholder='Search Contacts'/>
-          <ButtonPrimary>
+          <SearchInput placeholder='Search Contacts'
+            ref={(input) => searchInput = input}
+            onChange={search}/>
+          <ButtonPrimary onClick={search}>
             <FontAwesomeIcon icon='search' />
           </ButtonPrimary>
         </InputGroup>
         <ButtonInvisible style={{flex: '1 0 auto'}}
-          onClick={(e) => showModal('ADD_CONTACT')}>
+          onClick={() => showModal('ADD_CONTACT')}>
           <FontAwesomeIcon icon='plus'/> Add
         </ButtonInvisible>
       </HeaderContainer>

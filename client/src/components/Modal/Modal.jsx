@@ -2,6 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { showModal, hideModal } from '../../actions/actionCreators';
 import AddContactModal from './AddContactModal';
+import ChangeNameModal from './ChangeNameModal';
+import UploadPictureModal from './UploadPictureModal';
 
 const mapStateToProps = (state) => state.modal;
 
@@ -13,7 +15,9 @@ const mapDispatchToProps = (dispatch) => ({
 
 
 const modalTypes = {
-  'ADD_CONTACT': AddContactModal
+  'ADD_CONTACT': AddContactModal,
+  'CHANGE_NAME': ChangeNameModal,
+  'UPLOAD_PICTURE': UploadPictureModal
 };
 
 export const Modal = ({ modalType, modalProps, hideModal }) => {

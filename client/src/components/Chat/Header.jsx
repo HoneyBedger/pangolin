@@ -1,8 +1,9 @@
-import React, { Component } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import HeaderContainer from './HeaderContainer';
 import { ButtonInvisible } from '../Form/Elements';
+import { Dropdown, DropdownMenu, DropdownItem } from './DropdownElements';
 
 const ButtonInvisibleHideMedium = styled(ButtonInvisible)`
   @media (min-width: 992px) {
@@ -16,10 +17,10 @@ const ButtonInvisibleHideSmall = styled(ButtonInvisible)`
   }
 `;
 
-const ChatHeader = ({ name, logout }) => {
-  console.log('in header logout', logout);
+const ChatHeader = ({ name, picture, logout, showModal }) => {
   return (
     <HeaderContainer>
+      {picture && <img src={`data:${picture.type};base64, ${picture.data}`} style={{width: '50px', height: '50px'}} alt={name} />}
       <h3 style={{margin: '0 20px', fontWeight: 'normal'}}>{name}</h3>
       <div>
         <ButtonInvisibleHideSmall>
@@ -28,9 +29,19 @@ const ChatHeader = ({ name, logout }) => {
         <ButtonInvisibleHideMedium>
           <FontAwesomeIcon icon='list-ul' className='fa-lg'/>
         </ButtonInvisibleHideMedium>
-        <ButtonInvisible>
-          <FontAwesomeIcon icon='cog' className='fa-lg'/>
-        </ButtonInvisible>
+        <Dropdown>
+          <ButtonInvisible>
+            <FontAwesomeIcon icon='cog' className='fa-lg'/>
+          </ButtonInvisible>
+          <DropdownMenu>
+            <DropdownItem onClick={() => showModal('CHANGE_NAME')}>
+              Change name
+            </DropdownItem>
+            <DropdownItem onClick={() => showModal('UPLOAD_PICTURE')}>
+              Upload profile picture
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
         <ButtonInvisible onClick={logout}>
           <FontAwesomeIcon icon='sign-out-alt' className='fa-lg' /> Logout
         </ButtonInvisible>

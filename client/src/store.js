@@ -8,7 +8,7 @@ import { emit } from './socketClient';
 const history = createBrowserHistory();
 const defaultState = {
   user: {},
-  contacts: [],
+  contacts: {},
   modal: {},
   searchContacts: {}
 };

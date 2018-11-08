@@ -1,3 +1,4 @@
+const sharp = require('sharp');
 const authentication = require('../authentication');
 const User = require('../models/users');
 
@@ -20,7 +21,7 @@ module.exports = function (username, client, clientManager, chatManager) {
       // string and has to be invalidated
       let token = authentication.getToken({ _id: res._id, username });
       let user = { ...res, token, tokenIsValid: true };
-      console.log('got the user:', user);
+      //console.log('got the user:', user);
       callback(null, user);
     }).catch(err => callback(err.message, null));
   };
@@ -56,6 +57,30 @@ module.exports = function (username, client, clientManager, chatManager) {
     }).catch(err => console.log('In ADD_CONTACT Error: ', err.message));
   };
 
+  const handleUploadPicture = ({ picture, type, token }) => {
+    if (!authentication.tokenOK(token)) return;
+    User.findOne({ username })
+    .then(user => {
+        let pictureBuffer = new Buffer(picture);
+        sharp(pictureBuffer)
+        .resize({ width: 100, height: 100, fit: 'contain'})
+        .toBuffer()
+        .then(resizedPicture => {
+          user.picture = {
+            data: resizedPicture.toString('base64'),
+            type
+          };
+          user.save()
+          .then(updatedUser => {
+            client.emit('UPLOAD_PICTURE_SUCCESS', updatedUser.picture);
+          }).catch(err => {throw new Error(err.message)});
+        }).catch(err => {throw new Error(err.message)});
+    }).catch(err => {
+      console.log('In UPLOAD_PICTURE Error: ', err.message);
+      client.emit('UPLOAD_PICTURE_FAILED', err.message);
+    });
+  };
+
 
   const handleLogout = () => {
     console.log(username, " logged out");
@@ -87,6 +112,7 @@ module.exports = function (username, client, clientManager, chatManager) {
   return {
     getUser,
     handleAddContact,
+    handleUploadPicture,
     handleLogout,
     handleMessage,
     handleDisconnect

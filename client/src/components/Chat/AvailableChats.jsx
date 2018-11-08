@@ -8,7 +8,7 @@ import { InputGroup, SearchInput, ButtonPrimary } from '../Form/Elements';
 import { List, ListItem } from './ListElements';
 
 const ChatsColumn = styled(Column)`
-  borderRight: solid 1px #000;
+  border-right: solid 1px #1f253d;
   @media (max-width: 767px) {
     display: none;
   }
@@ -18,7 +18,7 @@ const AvailableChats = ({ chats, contacts, myUsername }) => {
   //sort chats by most recent message timestamp
 
   return (
-    <ChatsColumn style={{}}>
+    <ChatsColumn>
       <HeaderContainer style={{background: 'rgba(57, 66, 100, 0.5)'}}>
         <InputGroup>
           <SearchInput placeholder='Search Chats'/>

@@ -17,6 +17,13 @@ export const hideModal = () => {
 };
 
 //===CONTACTS===//
+export const searchExistingContacts = (searchString) => {
+  return {
+    type: actionTypes.SEARCH_EXISTING_CONTACTS,
+    payload: searchString
+  };
+};
+
 export const searchContacts = (searchString, token) => (dispatch) => {
   console.log('searching contacts with token', token);
   dispatch(contactsLoading());
@@ -178,3 +185,28 @@ export const logoutLocally = () => {
     type: actionTypes.LOGOUT_LOCALLY
   };
 }
+
+//===PROFILE PICTURE===//
+export const uploadPicture = (picture, type, token) => (dispatch, getState, emit) => {
+  console.log('uploading picture');
+  dispatch(uploadPictureInprogress());
+  const fr = new FileReader();
+  fr.onload = () => {
+    let data = fr.result;
+    emit('UPLOAD_PICTURE', { picture: data, type, token });
+  };
+  fr.readAsArrayBuffer(picture);
+};
+
+export const uploadPictureWarning = (message) => {
+  return {
+    type: actionTypes.UPLOAD_PICTURE_WARNING,
+    payload: message
+  };
+};
+
+export const uploadPictureInprogress = () => {
+  return {
+    type: actionTypes.UPLOAD_PICTURE_INPROGRESS
+  };
+};

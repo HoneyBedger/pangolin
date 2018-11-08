@@ -186,7 +186,7 @@ export const logoutLocally = () => {
   };
 }
 
-//===PROFILE PICTURE===//
+//===PROFILE UPDATES===//
 export const uploadPicture = (picture, type, token) => (dispatch, getState, emit) => {
   console.log('uploading picture');
   dispatch(uploadPictureInprogress());
@@ -208,5 +208,16 @@ export const uploadPictureWarning = (message) => {
 export const uploadPictureInprogress = () => {
   return {
     type: actionTypes.UPLOAD_PICTURE_INPROGRESS
+  };
+};
+
+export const changeName = (name, token) => (dispatch, getState, emit) => {
+  dispatch(changeNameInprogress());
+  emit('CHANGE_NAME', { name, token });
+};
+
+export const changeNameInprogress = () => {
+  return {
+    type: actionTypes.CHANGE_NAME_INPROGRESS
   };
 };

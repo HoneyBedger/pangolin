@@ -35,6 +35,7 @@ const ModalOverlay = styled.div`
 const ModalContainer = styled.div`
   max-height: 80%;
   max-width: 50%;
+  min-height: 170px;
   @media (max-width: 768px) {
     max-width: 80%;
   }

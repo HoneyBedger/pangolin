@@ -16,7 +16,7 @@ const mapStateToProps = (state) => {
     ...state.searchContacts,
     myUsername: user && user.username,
     token: user && user.token,
-    existingContacts: state.contacts.map(c => c.username)
+    existingContacts: state.contacts.contacts.map(c => c.username)
   };
 };
 
@@ -65,7 +65,8 @@ const AddContactModal = ({
             .map(c => (
               <ListItem key={c.username}>
                 <div>
-                  <ProfilePicture picture={c.picture} name={c.name} online={c.online}/>
+                  <ProfilePicture name={c.name} online={c.online}
+                    picture={c.picture && `data:${c.picture.type};base64, ${c.picture.data}`} />
                   {c.name}<br/>{c.username}
                 </div>
                 <ButtonOutline onClick={() => addContact(c, token)}>Add</ButtonOutline>

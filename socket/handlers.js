@@ -5,7 +5,7 @@ const User = require('../models/users');
 module.exports = function (username, client, clientManager, chatManager) {
 
 
-  const getUser = (callback) => {
+  const handleConnect = () => {
     console.log('getting the user after token:', username);
     User.findOne({ username })
     .populate('contacts', 'username name picture')
@@ -17,13 +17,16 @@ module.exports = function (username, client, clientManager, chatManager) {
           c.online = true;
       }
       if (!res) throw new Error('User not found.');
-      // Generate a new token since the old one just travelled as a query
-      // string and has to be invalidated
       let token = authentication.getToken({ _id: res._id, username });
       let user = { ...res, token, tokenIsValid: true };
-      //console.log('got the user:', user);
-      callback(null, user);
-    }).catch(err => callback(err.message, null));
+      clientManager.addClient(client, username);
+      client.emit('CONNECTION_TO_SOCKET_SUCCESS', user);
+      res.contacts.forEach(contact => {
+        let contactSocket = clientManager.getClient(contact.username);
+        if (contactSocket)
+          client.to(`${contactSocket.id}`).emit('CONTACT_UPDATE', { username, online: true });
+      });
+    }).catch(err => client.emit('CONNECTION_TO_SOCKET_FAILED', err.message));
   };
 
   const handleAddContact = ({ usernameToAdd, token }) => {
@@ -60,6 +63,7 @@ module.exports = function (username, client, clientManager, chatManager) {
   const handleUploadPicture = ({ picture, type, token }) => {
     if (!authentication.tokenOK(token)) return;
     User.findOne({ username })
+    .populate('contacts')
     .then(user => {
         let pictureBuffer = new Buffer(picture);
         sharp(pictureBuffer)
@@ -73,11 +77,37 @@ module.exports = function (username, client, clientManager, chatManager) {
           user.save()
           .then(updatedUser => {
             client.emit('UPLOAD_PICTURE_SUCCESS', updatedUser.picture);
+            // notify contacts of the user of change
+            user.contacts.forEach(contact => {
+              let contactSocket = clientManager.getClient(contact.username);
+              if (contactSocket) {
+                client.to(`${contactSocket.id}`).emit('CONTACT_UPDATE', { username, picture: updatedUser.picture });
+              }
+            });
           }).catch(err => {throw new Error(err.message)});
         }).catch(err => {throw new Error(err.message)});
     }).catch(err => {
       console.log('In UPLOAD_PICTURE Error: ', err.message);
       client.emit('UPLOAD_PICTURE_FAILED', err.message);
+    });
+  };
+
+  const handleChangeName = ({ name, token }) => {
+    console.log('changing name');
+    if (!authentication.tokenOK(token)) return;
+    User.findOneAndUpdate({ username }, { $set: { name } }, {new: true})
+    .populate('contacts')
+    .then(user => {
+      client.emit('CHANGE_NAME_SUCCESS', user.name);
+      // notify contacts of the user of change
+      user.contacts.forEach(contact => {
+        let contactSocket = clientManager.getClient(contact.username);
+        if (contactSocket)
+          client.to(`${contactSocket.id}`).emit('CONTACT_UPDATE', { username, name: user.name });
+      });
+    }).catch(err => {
+      console.log('In CHANGE_NAME Error: ', err.message);
+      client.emit('CHANGE_NAME_FAILED', err.message);
     });
   };
 
@@ -98,21 +128,21 @@ module.exports = function (username, client, clientManager, chatManager) {
     User.findOne({ username })
     .populate('contacts')
     .then(user => {
-      console.log('notifying contacts of', user);
+      //console.log('notifying contacts of', user);
       user.contacts.forEach(contact => {
         console.log('notifying', contact.username);
         let contactSocket = clientManager.getClient(contact.username);
         if (contactSocket)
-          console.log(contact.username, ' is online');
-          contactSocket.emit('CONTACT_OFFLINE', username);
+          contactSocket.emit('CONTACT_UPDATE', { username, online: false });
       })
     }).catch(err => console.log('In DISCONNECT Error: ', err.message));
   }
 
   return {
-    getUser,
+    handleConnect,
     handleAddContact,
     handleUploadPicture,
+    handleChangeName,
     handleLogout,
     handleMessage,
     handleDisconnect

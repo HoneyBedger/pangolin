@@ -14,7 +14,9 @@ const mapStateToProps = (state) => {
     token: user && user.token,
     warning: state.user.pictureWarning,
     error: state.user.pictureErrMessage,
-    isLoading: state.user.pictureIsLoading
+    isLoading: state.user.pictureIsLoading,
+    picture: user && user.picture,
+    name: user && user.name
   };
 };
 
@@ -28,15 +30,14 @@ const UploadPictureModal = ({
   token,
   warning,
   error,
+  picture,
+  name,
   isLoading,
   uploadPicture,
   uploadPictureWarning,
   hideModal
 }) => {
 
-  const close = () => {
-    hideModal();
-  };
 
   let fileInput;
 
@@ -61,9 +62,15 @@ const UploadPictureModal = ({
   };
 
   return (
-    <Modal close={close}>
-      <ModalHeader close={close}>Upload picture</ModalHeader>
+    <Modal close={hideModal}>
+      <ModalHeader close={hideModal}>Upload picture</ModalHeader>
       <ModalBody>
+        <div style={{display: 'flex', width: '300px',
+          justifyContent: 'flex-start', alignItems: 'center', marginBottom: '20px' }}>
+          <p style={{marginRight: '10px'}}>Currect picture:</p>
+          <ProfilePicture picture={`data:${picture.type};base64, ${picture.data}`} name={name}
+            showOnlineIndicator={false} size={'50px'}/>
+        </div>
         <div style={{display: 'flex', width: '300px',
           justifyContent: 'space-between', alignItems: 'baseline'}}>
           <FileInputWrapper>
@@ -79,6 +86,7 @@ const UploadPictureModal = ({
           }}>Upload</ButtonPrimary>
         </div>
         {isLoading && <LoadingSmall/>}
+        {error && <ErrorMessage>{error}</ErrorMessage>}
       </ModalBody>
     </Modal>
   );

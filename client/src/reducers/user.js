@@ -9,6 +9,8 @@ const initialState = {
   pictureWarning: null,
   pictureErrMessage: null,
   pictureIsLoading: false,
+  nameIsLoading: false,
+  nameErrMessage: null,
   user: {}
 };
 
@@ -49,6 +51,12 @@ const user = (state = initialState, action) => {
       return { ...state, user: { ...state.user, picture: action.payload }, pictureIsLoading: false };
     case socketActionTypes.UPLOAD_PICTURE_FAILED:
       return { ...state, pictureIsLoading: false, pictureErrMessage: action.payload };
+    case actionTypes.CHANGE_NAME_INPROGRESS:
+      return { ...state, nameIsLoading: true, nameErrMessage: null };
+    case socketActionTypes.CHANGE_NAME_SUCCESS:
+      return { ...state, user: { ...state.user, name: action.payload }, nameIsLoading: false };
+    case socketActionTypes.CHANGE_NAME_FAILED:
+      return { ...state, nameIsLoading: false, nameErrMessage: action.payload };
 
     case actionTypes.LOGOUT_LOCALLY:
       return initialState;

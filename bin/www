@@ -32,29 +32,20 @@ socket.on('connection', function (socket) {
   let username = socket.handshake.headers['username'];
 
   const {
-    getUser,
+    handleConnect,
     handleAddContact,
     handleUploadPicture,
+    handleChangeName,
     handleLogout,
     handleMessage,
     handleDisconnect
   } = makeHandlers(username, socket, clientManager, chatManager);
 
-  getUser((err, res) => {
-    if (err) socket.emit('CONNECTION_TO_SOCKET_FAILED', err);
-    else {
-      clientManager.addClient(socket, username);
-      socket.emit('CONNECTION_TO_SOCKET_SUCCESS', res);
-      res.contacts.forEach(contact => {
-        let contactSocket = clientManager.getClient(contact.username);
-        if (contactSocket)
-          socket.to(`${contactSocket.id}`).emit('CONTACT_ONLINE', res.username);
-      });
-    }
-  });
+  handleConnect();
 
   socket.on('ADD_CONTACT', handleAddContact);
   socket.on('UPLOAD_PICTURE', handleUploadPicture);
+  socket.on('CHANGE_NAME', handleChangeName);
 
   socket.on('LOGOUT', handleLogout);
   socket.on('message', handleMessage);

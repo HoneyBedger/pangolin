@@ -20,7 +20,6 @@ const ButtonInvisibleHideSmall = styled(ButtonInvisible)`
 const ChatHeader = ({ name, picture, logout, showModal }) => {
   return (
     <HeaderContainer>
-      {picture && <img src={`data:${picture.type};base64, ${picture.data}`} style={{width: '50px', height: '50px'}} alt={name} />}
       <h3 style={{margin: '0 20px', fontWeight: 'normal'}}>{name}</h3>
       <div>
         <ButtonInvisibleHideSmall>

@@ -22,20 +22,14 @@ const contacts = (state = initialState, action) => {
       return { ...state, contacts: state.concat(action.payload) };
     case socketActionTypes.NEW_CONTACT:
       return { ...state, contacts: state.concat({ ...action.payload, new: true }) };
-    case socketActionTypes.CONTACT_ONLINE: {
-      let newContacts = [].concat(state.contacts);
-      newContacts.forEach(c => {
-        if (c.username === action.payload) c.online  = true;
-      });
+    case socketActionTypes.CONTACT_UPDATE:
+      let newContacts = [];
+      for(let c of state.contacts) {
+        if (c.username === action.payload.username)
+          newContacts.push({ ...c, ...action.payload });
+        else newContacts.push(c);
+      }
       return { ...state, contacts: newContacts };
-    }
-    case socketActionTypes.CONTACT_OFFLINE: {
-      let newContacts = [].concat(state.contacts);
-      newContacts.forEach(c => {
-        if (c.username === action.payload) c.online  = false;
-      });
-      return { ...state, contacts: newContacts };
-    }
     case actionTypes.SEARCH_EXISTING_CONTACTS:
       console.log('beforeSearch is', state.beforeSearch);
       let contacts = state.beforeSearch ? state.beforeSearch : state.contacts;

@@ -48,8 +48,8 @@ const Contacts = ({ contacts, showModal, searchContacts, searchExistingContacts 
             {contacts.map(contact => (
               <ListItem key={contact.username}>
                 <div>
-                  <ProfilePicture picture={contact.picture}
-                    name={contact.name} online={contact.online} />
+                  <ProfilePicture name={contact.name} online={contact.online}
+                    picture={contact.picture && `data:${contact.picture.type};base64, ${contact.picture.data}`} />
                   {contact.name}
                 </div>
                 {contact.new && <Badge>new</Badge>}

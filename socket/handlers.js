@@ -1,33 +1,10 @@
 const sharp = require('sharp');
 const authentication = require('../authentication');
 const User = require('../models/users');
+const Chat = require('../models/chats');
 
-module.exports = function (username, client, clientManager, chatManager) {
+module.exports = function (_id, username, client, clientManager, chatManager) {
 
-
-  const handleConnect = () => {
-    console.log('getting the user after token:', username);
-    User.findOne({ username })
-    .populate('contacts', 'username name picture')
-    .select('username name picture contacts')
-    .lean()
-    .then(res => {
-      for (let c of res.contacts) {
-        if (clientManager.getClient(c.username))
-          c.online = true;
-      }
-      if (!res) throw new Error('User not found.');
-      let token = authentication.getToken({ _id: res._id, username });
-      let user = { ...res, token, tokenIsValid: true };
-      clientManager.addClient(client, username);
-      client.emit('CONNECTION_TO_SOCKET_SUCCESS', user);
-      res.contacts.forEach(contact => {
-        let contactSocket = clientManager.getClient(contact.username);
-        if (contactSocket)
-          client.to(`${contactSocket.id}`).emit('CONTACT_UPDATE', { username, online: true });
-      });
-    }).catch(err => client.emit('CONNECTION_TO_SOCKET_FAILED', err.message));
-  };
 
   const handleAddContact = ({ usernameToAdd, token }) => {
     console.log('Adding contact:', usernameToAdd);
@@ -42,16 +19,16 @@ module.exports = function (username, client, clientManager, chatManager) {
         userToAdd.contacts.push(user._id);
         // if userToAdd is not online, push to the list of new contacts so that
         // they get notified later
-        if (!clientManager.getClient(usernameToAdd))
+        if (!clientManager.getClient(String(userToAdd._id)))
           userToAdd.newContacts.push(user._id);
 
         userToAdd.save()
         .then(newUserToAdd => {
           // if userToAdd is online, notify them immidiately
-          let userToAddSocket = clientManager.getClient(usernameToAdd);
+          let userToAddSocket = clientManager.getClient(String(userToAdd._id));
           if (userToAddSocket) {
-            let { username, name, picture } = user;
-            let contact = { username, name, picture, online: true };
+            let { _id, username, name, picture } = user;
+            let contact = { _id, username, name, picture, online: true };
             userToAddSocket.emit('NEW_CONTACT', contact);
           }
         });
@@ -63,7 +40,6 @@ module.exports = function (username, client, clientManager, chatManager) {
   const handleUploadPicture = ({ picture, type, token }) => {
     if (!authentication.tokenOK(token)) return;
     User.findOne({ username })
-    .populate('contacts')
     .then(user => {
         let pictureBuffer = new Buffer(picture);
         sharp(pictureBuffer)
@@ -79,7 +55,7 @@ module.exports = function (username, client, clientManager, chatManager) {
             client.emit('UPLOAD_PICTURE_SUCCESS', updatedUser.picture);
             // notify contacts of the user of change
             user.contacts.forEach(contact => {
-              let contactSocket = clientManager.getClient(contact.username);
+              let contactSocket = clientManager.getClient(String(contact));
               if (contactSocket) {
                 client.to(`${contactSocket.id}`).emit('CONTACT_UPDATE', { username, picture: updatedUser.picture });
               }
@@ -96,12 +72,11 @@ module.exports = function (username, client, clientManager, chatManager) {
     console.log('changing name');
     if (!authentication.tokenOK(token)) return;
     User.findOneAndUpdate({ username }, { $set: { name } }, {new: true})
-    .populate('contacts')
     .then(user => {
       client.emit('CHANGE_NAME_SUCCESS', user.name);
       // notify contacts of the user of change
       user.contacts.forEach(contact => {
-        let contactSocket = clientManager.getClient(contact.username);
+        let contactSocket = clientManager.getClient(String(contact));
         if (contactSocket)
           client.to(`${contactSocket.id}`).emit('CONTACT_UPDATE', { username, name: user.name });
       });
@@ -111,27 +86,70 @@ module.exports = function (username, client, clientManager, chatManager) {
     });
   };
 
+  const handleFirstMessage = ({ users, content, token }) => {
+    console.log('received first message');
+    const notifyOfNewChat = (chat) => {
+      users.forEach(id => {
+        let userSocket = clientManager.getClient(String(id));
+        if (userSocket) // if the user is online
+          userSocket.emit('FIRST_MESSAGE_SUCCESS', chat);
+      });
+    };
+
+    if (!authentication.tokenOK(token)) return;
+    Chat.findOne({ users })
+    .then(res => {
+      if (!res) { // such a chat doesn't exist yet
+        let newChat = new Chat({ users, messages: [{ from: _id, content }] });
+        newChat.save()
+        .then(chat => notifyOfNewChat(chat))
+        .catch(err => {throw new Error(err.message)});
+      } else { // a chat already exists (if two users tried to create a chat approx at the same time)
+        res.messages.push({ from: _id, content });
+        res.save()
+        .then(chat => notifyOfNewChat(chat))
+        .catch(err => {throw new Error(err.message)});
+      }
+    })
+    .catch(err => client.emit('FIRST_MESSAGE_FAILED', err.message));
+  };
+
+  const handleMessage = ({ chatId, content, token }) => {
+    if (!authentication.tokenOK(token)) return;
+    Chat.findById(chatId)
+    .then(chat => {
+      if (!chat) throw new Error('Chat not found.');
+      else {
+        chat.messages.push({ from: _id, content});
+        chat.save()
+        .then(updatedChat => {
+          updatedChat.users.forEach(id => {
+            let userSocket = clientManager.getClient(String(id));
+            if (userSocket)
+              userSocket.emit('MESSAGE_SUCCESS', updatedChat);
+          });
+        })
+        .catch(err => {throw new Error(err.message)});
+      }
+    })
+    .catch(err => socket.emit('MESSAGE_FAILED', err.message));
+  }
 
   const handleLogout = () => {
     console.log(username, " logged out");
-    clientManager.removeClient(username);
+    clientManager.removeClient(String(_id));
     client.disconnect(true);
-  }
-
-  function handleMessage(fromUsername, toUsernames, content, callback) {
-    console.log(username, " wrote to ", toUsernames, " message: ", content);
   }
 
   function handleDisconnect() {
     console.log(username, ' disconnected');
-    clientManager.removeClient(client);
+    clientManager.removeClient(String(_id));
     User.findOne({ username })
-    .populate('contacts')
     .then(user => {
       //console.log('notifying contacts of', user);
       user.contacts.forEach(contact => {
         console.log('notifying', contact.username);
-        let contactSocket = clientManager.getClient(contact.username);
+        let contactSocket = clientManager.getClient(String(contact));
         if (contactSocket)
           contactSocket.emit('CONTACT_UPDATE', { username, online: false });
       })
@@ -139,10 +157,10 @@ module.exports = function (username, client, clientManager, chatManager) {
   }
 
   return {
-    handleConnect,
     handleAddContact,
     handleUploadPicture,
     handleChangeName,
+    handleFirstMessage,
     handleLogout,
     handleMessage,
     handleDisconnect

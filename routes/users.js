@@ -11,14 +11,6 @@ userRouter.use(bodyParser.json());
 //===GET USERS===//
 userRouter.get('/', authentication.verifyUserHTTP, (req, res, next) => {
   console.log('fetching users');
-  const removeSensitiveInfo = (users) => {
-    return users.map(user => ({
-      username: user.username,
-      name: user.name,
-      picture: user.picture
-    }));
-  };
-
   if (req.query.search) {
     User.find({$text: {$search: req.query.search}}, { score: { $meta: "textScore" } })
     .sort({ score: { $meta: "textScore" } })
@@ -26,7 +18,7 @@ userRouter.get('/', authentication.verifyUserHTTP, (req, res, next) => {
     .lean()
     .then(users => {
       for (let user of users) {
-        if (clientManager.getClient(user.username)){
+        if (clientManager.getClient(String(user._id))){
           console.log(user.username, ' is online');
           user.online = true;
         }
@@ -41,7 +33,7 @@ userRouter.get('/', authentication.verifyUserHTTP, (req, res, next) => {
     .lean()
     .then(users => {
       for (let user of users) {
-        if (clientManager.getClient(user.username))
+        if (clientManager.getClient(String(user._id)))
           user.online = true;
       }
       res.status(200).json(users);

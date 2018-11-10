@@ -9,6 +9,7 @@ const authentication = require('../authentication');
 const clientManager = require('../socket/clientManager');
 const chatManager = require('../socket/chatManager')();
 const makeHandlers = require('../socket/handlers');
+const handleConnect = require('../socket/handleConnect');
 
 
 // Get port from environment and store in Express.
@@ -29,35 +30,45 @@ socket.use((socket, next) => authentication.verifyUser(socket, next));
 // Listen to WebSocket events
 socket.on('connection', function (socket) {
 
-  let username = socket.handshake.headers['username'];
+  handleConnect(socket, clientManager, (err, res) => {
+    if (err) {
+      console.log('socket connection error', err);
+      socket.disconnect(true);
+    }
+    else {
+      const _id = res._id;
+      const username = res.username;
 
-  const {
-    handleConnect,
-    handleAddContact,
-    handleUploadPicture,
-    handleChangeName,
-    handleLogout,
-    handleMessage,
-    handleDisconnect
-  } = makeHandlers(username, socket, clientManager, chatManager);
+      const {
+        handleAddContact,
+        handleUploadPicture,
+        handleChangeName,
+        handleFirstMessage,
+        handleMessage,
+        handleLogout,
+        handleDisconnect
+      } = makeHandlers(_id, username, socket, clientManager, chatManager);
 
-  handleConnect();
+      socket.on('ADD_CONTACT', handleAddContact);
+      socket.on('UPLOAD_PICTURE', handleUploadPicture);
+      socket.on('CHANGE_NAME', handleChangeName);
 
-  socket.on('ADD_CONTACT', handleAddContact);
-  socket.on('UPLOAD_PICTURE', handleUploadPicture);
-  socket.on('CHANGE_NAME', handleChangeName);
+      socket.on('FIRST_MESSAGE', handleFirstMessage);
+      socket.on('MESSAGE', handleMessage);
 
-  socket.on('LOGOUT', handleLogout);
-  socket.on('message', handleMessage);
+      socket.on('LOGOUT', handleLogout);
 
-  socket.on('disconnect', function () {
-    console.log('client disconnect...', socket.id);
-    handleDisconnect();
-  });
+      socket.on('disconnect', function () {
+        console.log('client disconnect...', socket.id);
+        handleDisconnect();
+      });
 
-  socket.on('error', function (err) {
-    console.log('received error from client:', socket.id);
-    console.log(err);
+      socket.on('error', function (err) {
+        console.log('received error from client:', socket.id);
+        console.log(err);
+      });
+
+    }
   });
 
 });

@@ -9,14 +9,16 @@ import ChatHeader from './Header';
 import ChatBody from './ChatBody';
 import AvailableChats from './AvailableChats';
 import Contacts from './Contacts';
-import { fakeUser } from '../../fakeData/user';
-import { contacts } from '../../fakeData/contacts';
-import { chats } from '../../fakeData/chats';
+//import { fakeUser } from '../../fakeData/user';
+//import { contacts } from '../../fakeData/contacts';
+//import { chats } from '../../fakeData/chats';
 
 const mapStateToProps = (state) => {
   return {
     user: state.user.user,
-    contacts: state.contacts.contacts
+    contacts: state.contacts,
+    chats: state.chats,
+    searchContacts: state.searchContacts
   };
 };
 
@@ -54,13 +56,21 @@ class Chat extends Component {
           <Column>
             <ChatHeader name={this.props.user.name} picture={this.props.user.picture}
               logout={this.props.logout} showModal={this.props.showModal}/>
-            <ChatBody chat={chats[1]} contacts={contacts} user={fakeUser}/>
+            <ChatBody chat={ this.props.chats.selectedChatId
+                ? this.props.chats.chats.filter(chat => chat._id === this.props.chats.selectedChatId)[0]
+                : this.props.chats.chats[0] }
+              contacts={this.props.contacts.contacts} user={this.props.user}
+              sendFirstMessage={this.props.sendFirstMessage}
+              sendMessage={this.props.sendMessage} />
           </Column>
-          <AvailableChats chats={chats} contacts={contacts} myUsername={fakeUser.username} />
+          <AvailableChats chats={this.props.chats.chats}
+            contacts={this.props.contacts.contacts}
+            userId={this.props.user && this.props.user._id} />
           <Contacts contacts={this.props.contacts}
             showModal={this.props.showModal}
             searchContacts={this.props.searchContacts}
-            searchExistingContacts={this.props.searchExistingContacts}/>
+            searchExistingContacts={this.props.searchExistingContacts}
+            selectContact={this.props.selectContact} />
         </ChatGrid>
       </div>
     );

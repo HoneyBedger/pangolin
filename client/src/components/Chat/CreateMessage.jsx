@@ -25,10 +25,13 @@ const MessageInput = styled.textarea`
 
 //TODO: make sure the message is sent on hitting Enter
 
-const CreateMessage = () => {
+const CreateMessage = ({ send }) => {
+  let messageInput;
+
   return (
     <div style={{padding: '15px 7px 20px 27px'}}>
-      <MessageInput rows='10' placeholder='Type here'/>
+      <MessageInput rows='10' placeholder='Type here'
+        ref={(input) => messageInput = input} />
       <div style={{float: 'left', marginLeft: '20px'}}>
         <div style={{marginBottom: '18px'}}>
         <ButtonInvisible>
@@ -38,7 +41,10 @@ const CreateMessage = () => {
           <FontAwesomeIcon icon='microphone' className='fa-lg'/>
         </ButtonInvisible>
         </div>
-        <ButtonPrimary>Send</ButtonPrimary>
+        <ButtonPrimary onClick={() => {
+            if (messageInput.value && messageInput.value.trim() !== '')
+              send(messageInput.value);
+          }}>Send</ButtonPrimary>
       </div>
     </div>
   );

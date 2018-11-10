@@ -2,16 +2,18 @@
 const onlineClients = new Map();
 
 const clientManager = {
-  addClient: (socket, username) => {
-    onlineClients.set(username, socket);
+  addClient: (socket, _id) => {
+    console.log('adding', _id, 'to clientManager');
+    onlineClients.set(_id, socket);
   },
 
-  removeClient: (username) => {
-    onlineClients.delete(username);
+  removeClient: (_id) => {
+    onlineClients.delete(_id);
   },
 
-  getClient: (username) => {
-    return onlineClients.get(username);
+  getClient: (_id) => {
+    console.log('getting', _id, 'to clientManager');
+    return onlineClients.get(_id);
   }
 };
 

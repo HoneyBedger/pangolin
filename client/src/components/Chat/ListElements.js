@@ -1,3 +1,4 @@
+import React from 'react';
 import styled from 'styled-components';
 
 const List = styled.ul`
@@ -8,28 +9,34 @@ const List = styled.ul`
   overflow: auto;
 `;
 
-const ListItem = styled.li`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  >div {
-    display: flex;
-    align-items: center;
-    margin-right: 10px;
-  }
-  flex-wrap: wrap;
-  padding-right: 10px;
-  border-bottom: solid 1px #9099b7;
-  :hover {
-    color: #fff;
-    background-color: rgba(255, 255, 255, 0.2);
-    cursor: pointer;
-    img {
-      -webkit-filter: contrast(140%);
-    }
-  }
-`;
+const ListItem = ({ selected, children, onClick }) => {
+  const ListItem = styled.li`
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      >div {
+        display: flex;
+        align-items: center;
+        margin-right: 10px;
+      }
+      flex-wrap: wrap;
+      padding-right: 10px;
+      background-color: ${selected ? 'rgba(255, 255, 255, 0.2)' : 'transparent'};
+      color: ${selected ? '#fff' : 'inherit'};
+      border-bottom: solid 1px #9099b7;
+      :hover {
+        color: #fff;
+        background-color: rgba(255, 255, 255, 0.2);
+        cursor: pointer;
+        img {
+          -webkit-filter: contrast(140%);
+        }
+      }
+    `;
+    return <ListItem onClick={onClick}>{children}</ListItem>;
+};
+
 
 const Badge = styled.p`
   justify-self: end;

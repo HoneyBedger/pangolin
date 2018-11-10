@@ -9,6 +9,7 @@ const history = createBrowserHistory();
 const defaultState = {
   user: {},
   contacts: {},
+  chats: {},
   modal: {},
   searchContacts: {}
 };

@@ -78,6 +78,24 @@ export const addContactLocally = (contact) => {
   };
 };
 
+export const selectContact = (id) =>  {
+  return {
+    type: actionTypes.SELECT_CONTACT,
+    payload: id
+  };
+};
+
+
+//===CHAT===//
+export const sendFirstMessage = (users, content, token) => (dispatch, getState, emit) => {
+  console.log('sending first message');
+  emit('FIRST_MESSAGE', { users, content, token });
+};
+
+export const sendMessage = (chatId, content, token) => (dispatch, getState, emit) => {
+  emit('MESSAGE', { chatId, content, token })
+};
+
 
 //===USER===//
 export const fetchUser = (username, password) => (dispatch) => {

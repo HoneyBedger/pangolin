@@ -68,7 +68,7 @@ const UploadPictureModal = ({
         <div style={{display: 'flex', width: '300px',
           justifyContent: 'flex-start', alignItems: 'center', marginBottom: '20px' }}>
           <p style={{marginRight: '10px'}}>Currect picture:</p>
-          <ProfilePicture picture={`data:${picture.type};base64, ${picture.data}`} name={name}
+          <ProfilePicture picture={picture && `data:${picture.type};base64, ${picture.data}`} name={name}
             showOnlineIndicator={false} size={'50px'}/>
         </div>
         <div style={{display: 'flex', width: '300px',

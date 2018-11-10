@@ -14,8 +14,15 @@ const ContactsColumn = styled(Column)`
   }
 `;
 
-const Contacts = ({ contacts, showModal, searchContacts, searchExistingContacts }) => {
-  contacts.sort((c1, c2) => {
+const Contacts = ({ contacts, showModal, searchContacts, searchExistingContacts,
+  selectContact }) => {
+
+  console.log('selectContact is', selectContact, 'showModal is', showModal);
+
+  //TODO: need to select the 1st contact by default if there are no chats.
+  // maybe do it in componentDidMount?
+
+  contacts.contacts.sort((c1, c2) => {
     if (c1.name === c2.name) return 0;
     return c1.name > c2.name ? 1 : -1;
   });
@@ -42,11 +49,13 @@ const Contacts = ({ contacts, showModal, searchContacts, searchExistingContacts 
           <FontAwesomeIcon icon='plus'/> Add
         </ButtonInvisible>
       </HeaderContainer>
-      {contacts.length === 0
+      {contacts.contacts.length === 0
         ? <p style={{paddingLeft: '14px', paddingRight: '7px'}}>You do not have any contacts yet.</p>
         : <List>
-            {contacts.map(contact => (
-              <ListItem key={contact.username}>
+            {contacts.contacts.map(contact => (
+              <ListItem key={contact.username}
+                selected={contact._id === contacts.selectedContactId}
+                onClick={() => selectContact(contact._id)} >
                 <div>
                   <ProfilePicture name={contact.name} online={contact.online}
                     picture={contact.picture && `data:${contact.picture.type};base64, ${contact.picture.data}`} />

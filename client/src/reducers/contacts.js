@@ -2,7 +2,11 @@ import Fuse from 'fuse.js';
 import actionTypes from '../actions/actionTypes';
 import socketActionTypes from '../actions/socketActionTypes';
 
-const initialState = { contacts: [], beforeSearch: null};
+const initialState = {
+  contacts: [],
+  beforeSearch: null,
+  selectedContactId: null
+};
 
 const searchOptions = {
   keys: ['name', 'username'],
@@ -15,13 +19,13 @@ const searchOptions = {
 const contacts = (state = initialState, action) => {
   switch (action.type) {
     case socketActionTypes.CONNECTION_TO_SOCKET_SUCCESS:
-      return { ...state, contacts: action.payload.contacts };
+      return { ...state, contacts: action.payload.user.contacts };
     case socketActionTypes.CONNECTION_TO_SOCKET_FAILED:
       return initialState;
     case actionTypes.ADD_CONTACT_LOCALLY:
-      return { ...state, contacts: state.concat(action.payload) };
+      return { ...state, contacts: state.contacts.concat(action.payload) };
     case socketActionTypes.NEW_CONTACT:
-      return { ...state, contacts: state.concat({ ...action.payload, new: true }) };
+      return { ...state, contacts: state.contacts.concat({ ...action.payload, new: true }) };
     case socketActionTypes.CONTACT_UPDATE:
       let newContacts = [];
       for(let c of state.contacts) {
@@ -39,6 +43,8 @@ const contacts = (state = initialState, action) => {
       } else {
         return { contacts, beforeSearch: null };
       }
+    case actionTypes.SELECT_CONTACT:
+      return { ...state, selectedContactId: action.payload };
     case actionTypes.LOGOUT_LOCALLY:
       return initialState;
     default:

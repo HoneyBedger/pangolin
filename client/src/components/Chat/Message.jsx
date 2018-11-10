@@ -39,7 +39,8 @@ const Message = ({ msg, fromContact, fromMe }) => {
     </div>
   );
 
-  const Picture = <ProfilePicture picture={fromContact.picture} name={fromContact.name}
+  const Picture = <ProfilePicture name={fromContact.name}
+    picture={fromContact.picture && `data:${fromContact.picture.type};base64, ${fromContact.picture.data}`}
     showOnlineIndicator={false} size={'30px'}/>;
 
   return (

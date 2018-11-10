@@ -29,9 +29,9 @@ const user = (state = initialState, action) => {
     case actionTypes.USER_REGISTERING_FAILED:
       return { ...state, isLoading: false, registerErrMessage: action.payload, user: {} };
     case socketActionTypes.CONNECTION_TO_SOCKET_SUCCESS:
+      let { _id, username, name, picture, token, tokenIsValid } = action.payload.user;
       return { ...state, isLoading: false, socketErrMessage: null,
-        user: { username: action.payload.username, name: action.payload.name,
-          picture: action.payload.picture, token: action.payload.token, tokenIsValid: action.payload.tokenIsValid } };
+        user: { _id, username, name, picture, token, tokenIsValid } };
     case socketActionTypes.CONNECTION_TO_SOCKET_FAILED:
       return { ...state, isLoading: false, socketErrMessage: action.payload, user: {} };
     case socketActionTypes.SOCKET_ERROR:

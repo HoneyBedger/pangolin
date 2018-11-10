@@ -46,15 +46,22 @@ const MessageHistory = styled.div`
   }
 `;
 
-const ChatBody = ({ chat: { users, messages }, contacts, user }) => {
+const ChatBody = ({ chat, contacts, user, sendFirstMessage, sendMessage }) => {
 
-  const participants = users.filter(username => username !== user.username)
-  .map(username => {
-    let contact = contacts.filter(contact => contact.username === username)[0];
+  if (!chat) return <p style={{padding: '20px 7px 20px 27px'}}>Select a person and start messaging!</p>
+
+  const send = (content) => {
+    if (chat.messages.length == 0) sendFirstMessage(chat.users, content, user.token);
+    else sendMessage(chat._id, content, user.token);
+  };
+
+  const participants = chat.users.filter(id => id !== user._id)
+  .map(id => {
+    let contact = contacts.filter(contact => contact._id === id)[0];
     return contact.name;
   }).join(', ');
 
-  messages.sort((m1, m2) => m1.timestamp - m2.timestamp);
+  chat.messages.sort((m1, m2) => m1.timestamp - m2.timestamp);
   //TODO: set initial scrolling position to end
 
   return (
@@ -66,15 +73,15 @@ const ChatBody = ({ chat: { users, messages }, contacts, user }) => {
         </ButtonInvisible>
       </ChatBodyHeader>
       <MessageHistory>
-        {messages.map(msg => {
-          let fromContact = (msg.from === user.username)
+        {chat.messages.map((msg, i) => {
+          let fromContact = (msg.from === user._id)
             ? user
-            : contacts.filter(contact => contact.username === msg.from)[0];
-          return <Message key={messages.indexOf(msg)} msg={msg}
-            fromContact={fromContact} fromMe={msg.from === user.username}/>;
+            : contacts.filter(contact => contact._id === msg.from)[0];
+          return <Message key={i} msg={msg}
+            fromContact={fromContact} fromMe={msg.from === user._id}/>;
         })}
       </MessageHistory>
-      <CreateMessage />
+      <CreateMessage send={send} />
     </ChatBodyContainer>
   );
 };

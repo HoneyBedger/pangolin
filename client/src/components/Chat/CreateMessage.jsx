@@ -28,10 +28,20 @@ const MessageInput = styled.textarea`
 const CreateMessage = ({ send }) => {
   let messageInput;
 
+  const handleKeyPress = (e) => {
+    // send on Enter
+    let keyCode = (e.keyCode ? e.keyCode : e.which);
+    if (keyCode === 13 && messageInput.value && messageInput.value.trim() !== '') {
+      send(messageInput.value);
+      messageInput.value = '';
+    }
+  };
+
   return (
     <div style={{padding: '15px 7px 20px 27px'}}>
       <MessageInput rows='10' placeholder='Type here'
-        ref={(input) => messageInput = input} />
+        ref={(input) => messageInput = input}
+        onKeyPress={(e) => handleKeyPress(e)} />
       <div style={{float: 'left', marginLeft: '20px'}}>
         <div style={{marginBottom: '18px'}}>
         <ButtonInvisible>

@@ -17,6 +17,15 @@ const ChatsColumn = styled(Column)`
 
 const AvailableChats = ({ chats, contacts, userId, searchExistingChats, selectChat }) => {
   //sort chats by most recent message timestamp
+  chats.chats.sort((chat1, chat2) => {
+    console.log('chat1, chat2', chat1, chat2);
+    let lastMsgTime1 = chat1.messages.length > 0 && new Date(chat1.messages[chat1.messages.length - 1].updatedAt);
+    let lastMsgTime2 = chat2.messages.length > 0 && new Date(chat2.messages[chat2.messages.length - 1].updatedAt);
+    if (lastMsgTime1 && lastMsgTime1) return lastMsgTime2 - lastMsgTime1;
+    else if (lastMsgTime1) return -1;
+    else if (lastMsgTime2) return 1;
+    else return 0;
+  });
 
   let searchInput;
   const search = () => {
@@ -25,9 +34,9 @@ const AvailableChats = ({ chats, contacts, userId, searchExistingChats, selectCh
   };
 
   let ChatList;
-  if (!userId || !contacts || !chats)
+  if (!userId || !contacts || !chats.chats)
     ChatList = <ErrorMessage style={{padding: '20px 7px 20px 14px', textAlign: 'left'}}>Sorry, something is wrong with your chats.</ErrorMessage>
-  else if (chats.length === 0)
+  else if (chats.chats.length === 0)
     ChatList = <p style={{padding: '20px 7px 20px 14px', textAlign: 'left'}}>No chats.</p>
   else
     ChatList = (

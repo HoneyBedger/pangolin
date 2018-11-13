@@ -145,15 +145,49 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
         chat.save()
         .then(updatedChat => {
           updatedChat.users.forEach(id => {
-            let userSocket = clientManager.getClient(String(id));
-            if (userSocket)
-              userSocket.emit('ADD_PERSON_TO_CHAT_SUCCESS', { chatId, userId });
+            User.findById(id)
+            .then(participant => {
+              for (let userId of updatedChat.users) {
+                if (userId !== user._id && !participant.contacts.includes(String(userId)))
+                  addContactOneSide(participant, userId, (err) => {
+                    if (err) throw new Error(err.mesage);
+                    let userSocket = clientManager.getClient(String(id));
+                    if (userSocket)
+                      userSocket.emit('ADD_PERSON_TO_CHAT_SUCCESS', { chatId, userId });
+                  });
+                else {
+                  let userSocket = clientManager.getClient(String(id));
+                  if (userSocket)
+                    userSocket.emit('ADD_PERSON_TO_CHAT_SUCCESS', { chatId, userId });
+                }
+              }
+            })
           });
         })
         .catch(err => {throw new Error(err.message)});
       }
     })
     .catch(err => socket.emit('ADD_PERSON_TO_CHAT_FAILED', err.message));
+  };
+
+  const addContactOneSide = (user, idToAdd, callback) => {
+    user.contacts.push(idToAdd);
+    let userSocket = clientManager.getClient(String(user._id));
+    if (!userSocket) user.newContacts.push(idToAdd);
+    user.save()
+    .then(updatedUser => {
+      User.findById(idToAdd)
+      .lean()
+      .then(newContact => {
+        let { _id, username, name, picture } = newContact;
+        let newContactSocket = clientManager.getClient(String(newContact._id));
+        if (userSocket)
+          userSocket.emit('NEW_CONTACT', { _id, username, name, picture, online: !!newContactSocket });
+        callback(null);
+      })
+      .catch(err => callback(err));
+    })
+    .catch(err => callback(err));
   };
 
   const handleLogout = () => {

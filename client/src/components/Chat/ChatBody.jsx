@@ -55,13 +55,17 @@ const ChatBody = ({ chat, contacts, user, sendFirstMessage, sendMessage, showMod
     else sendMessage(chat._id, content, user.token);
   };
 
+  console.log('in Chat Body chat, contacts', chat, contacts);
   const participants = chat.users.filter(id => id !== user._id)
   .map(id => {
     let contact = contacts.filter(contact => contact._id === id)[0];
     return contact.name;
   }).join(', ');
 
-  chat.messages.sort((m1, m2) => m1.timestamp - m2.timestamp);
+  chat.messages.sort((m1, m2) => new Date(m1.updatedAt) - new Date(m2.updatedAt));
+  console.log('in ChatBody messages:', chat.messages.map(msg => {
+    return { ...msg, updatedAt: new Date(msg.updatedAt)};
+  }));
   //TODO: set initial scrolling position to end
 
   return (

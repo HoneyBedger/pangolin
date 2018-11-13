@@ -35,7 +35,10 @@ const Message = ({ msg, fromContact, fromMe }) => {
   const NameAndTime = (
     <div>
       <MessageHeaderItem>{fromContact.name}</MessageHeaderItem>
-      <MessageHeaderItem>{msg.timestamp}</MessageHeaderItem>
+      <MessageHeaderItem>
+        {new Intl.DateTimeFormat('en-US', {
+          year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', hour12: true })
+          .format(new Date(msg.updatedAt))}</MessageHeaderItem>
     </div>
   );
 

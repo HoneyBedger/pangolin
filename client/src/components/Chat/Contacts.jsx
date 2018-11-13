@@ -14,8 +14,8 @@ const ContactsColumn = styled(Column)`
   }
 `;
 
-const Contacts = ({ contacts, showModal, searchContacts, searchExistingContacts,
-  selectContact }) => {
+const Contacts = ({ contacts, showModal, searchContacts,
+  searchExistingContacts, selectContact }) => {
 
   console.log('selectContact is', selectContact, 'showModal is', showModal);
 

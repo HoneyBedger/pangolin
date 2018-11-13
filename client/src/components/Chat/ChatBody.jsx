@@ -46,7 +46,7 @@ const MessageHistory = styled.div`
   }
 `;
 
-const ChatBody = ({ chat, contacts, user, sendFirstMessage, sendMessage }) => {
+const ChatBody = ({ chat, contacts, user, sendFirstMessage, sendMessage, showModal }) => {
 
   if (!chat) return <p style={{padding: '20px 7px 20px 27px'}}>Select a person and start messaging!</p>
 
@@ -68,7 +68,8 @@ const ChatBody = ({ chat, contacts, user, sendFirstMessage, sendMessage }) => {
     <ChatBodyContainer>
       <ChatBodyHeader>
         <HeaderH3>{participants}</HeaderH3>
-        <ButtonInvisible style={{lineHeight: '39px'}}>
+        <ButtonInvisible style={{lineHeight: '39px'}}
+          onClick={() => showModal('ADD_PERSON')}>
           <FontAwesomeIcon icon='plus'/> Add person
         </ButtonInvisible>
       </ChatBodyHeader>

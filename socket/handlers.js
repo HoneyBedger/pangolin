@@ -126,14 +126,35 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
           updatedChat.users.forEach(id => {
             let userSocket = clientManager.getClient(String(id));
             if (userSocket)
-              userSocket.emit('MESSAGE_SUCCESS', updatedChat);
+              userSocket.emit('MESSAGE_SUCCESS', { chatId, message: updatedChat.messages[updatedChat.messages.length -  1] });
           });
         })
         .catch(err => {throw new Error(err.message)});
       }
     })
     .catch(err => socket.emit('MESSAGE_FAILED', err.message));
-  }
+  };
+
+  const handleAddPersonToChat = ({ chatId, userId, token }) => {
+    if (!authentication.tokenOK(token)) return;
+    Chat.findById(chatId)
+    .then(chat => {
+      if (!chat) throw new Error('Chat not found.');
+      else {
+        chat.users.push(userId);
+        chat.save()
+        .then(updatedChat => {
+          updatedChat.users.forEach(id => {
+            let userSocket = clientManager.getClient(String(id));
+            if (userSocket)
+              userSocket.emit('ADD_PERSON_TO_CHAT_SUCCESS', { chatId, userId });
+          });
+        })
+        .catch(err => {throw new Error(err.message)});
+      }
+    })
+    .catch(err => socket.emit('ADD_PERSON_TO_CHAT_FAILED', err.message));
+  };
 
   const handleLogout = () => {
     console.log(username, " logged out");
@@ -161,6 +182,7 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
     handleUploadPicture,
     handleChangeName,
     handleFirstMessage,
+    handleAddPersonToChat,
     handleLogout,
     handleMessage,
     handleDisconnect

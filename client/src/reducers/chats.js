@@ -60,12 +60,23 @@ const chats = (state = initialState, action) => {
       return state;
     case socketActionTypes.MESSAGE_SUCCESS: {
       let newChats = state.chats.map(chat => {
-        if (chat._id === action.payload._id) return action.payload;
+        if (chat._id === action.payload.chatId)
+          return { ...chat, messages: chat.messages.concat(action.payload.message) };
         else return chat;
       });
       return { ...state, chats: newChats };
     }
     case socketActionTypes.MESSAGE_FAILED:
+      return state;
+    case socketActionTypes.ADD_PERSON_TO_CHAT_SUCCESS: {
+      let newChats = state.chats.map(chat => {
+        if (chat._id === action.payload.chatId)
+          return { ...chat, users: chat.users.concat(action.payload.userId) };
+        else return chat;
+      });
+      return { ...state, chats: newChats };
+    }
+    case socketActionTypes.ADD_PERSON_TO_CHAT_FAILED:
       return state;
     default:
       return state;

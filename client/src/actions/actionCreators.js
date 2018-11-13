@@ -24,6 +24,13 @@ export const searchExistingContacts = (searchString) => {
   };
 };
 
+export const searchContactsInModal = (searchString) => {
+  return {
+    type: actionTypes.SEARCH_CONTACTS_IN_MODAL,
+    payload: searchString
+  };
+};
+
 export const searchContacts = (searchString, token) => (dispatch) => {
   console.log('searching contacts with token', token);
   dispatch(contactsLoading());
@@ -94,6 +101,10 @@ export const sendFirstMessage = (users, content, token) => (dispatch, getState, 
 
 export const sendMessage = (chatId, content, token) => (dispatch, getState, emit) => {
   emit('MESSAGE', { chatId, content, token })
+};
+
+export const addPersonToChat = (chatId, userId, token) => (dispatch, getState, emit) => {
+  emit('ADD_PERSON_TO_CHAT', { chatId, userId, token });
 };
 
 

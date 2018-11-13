@@ -4,7 +4,9 @@ import socketActionTypes from '../actions/socketActionTypes';
 
 const initialState = {
   contacts: [],
+  contactsInModal: [],
   beforeSearch: null,
+  beforeSearchInModal: null,
   selectedContactId: null
 };
 
@@ -19,13 +21,16 @@ const searchOptions = {
 const contacts = (state = initialState, action) => {
   switch (action.type) {
     case socketActionTypes.CONNECTION_TO_SOCKET_SUCCESS:
-      return { ...state, contacts: action.payload.user.contacts };
+      return { ...state, contacts: action.payload.user.contacts,
+        contactsInModal: action.payload.user.contacts };
     case socketActionTypes.CONNECTION_TO_SOCKET_FAILED:
       return initialState;
     case actionTypes.ADD_CONTACT_LOCALLY:
-      return { ...state, contacts: state.contacts.concat(action.payload) };
+      return { ...state, contacts: state.contacts.concat(action.payload),
+        contactsInModal: state.contactsInModal.concat(action.payload) };
     case socketActionTypes.NEW_CONTACT:
-      return { ...state, contacts: state.contacts.concat({ ...action.payload, new: true }) };
+      return { ...state, contacts: state.contacts.concat({ ...action.payload, new: true }),
+        contactsInModal: state.contactsInModal.concat(action.payload) };
     case socketActionTypes.CONTACT_UPDATE:
       let newContacts = [];
       for(let c of state.contacts) {
@@ -33,16 +38,24 @@ const contacts = (state = initialState, action) => {
           newContacts.push({ ...c, ...action.payload });
         else newContacts.push(c);
       }
-      return { ...state, contacts: newContacts };
+      return { ...state, contacts: newContacts, contactsInModal: newContacts };
     case actionTypes.SEARCH_EXISTING_CONTACTS:
-      console.log('beforeSearch is', state.beforeSearch);
       let contacts = state.beforeSearch ? state.beforeSearch : state.contacts;
       if (action.payload.length >= 2 && action.payload.length <= 32) {
         const fuse = new Fuse(contacts, searchOptions);
-        return { contacts: fuse.search(action.payload), beforeSearch: contacts};
+        return { ...state, contacts: fuse.search(action.payload), beforeSearch: contacts};
       } else {
-        return { contacts, beforeSearch: null };
+        return { ...state, contacts, beforeSearch: null };
       }
+    case actionTypes.SEARCH_CONTACTS_IN_MODAL: {
+      let contactsInModal = state.beforeSearchInModal ? state.beforeSearchInModal : state.contactsInModal;
+      if (action.payload.length >= 2 && action.payload.length <= 32) {
+        const fuse = new Fuse(contactsInModal, searchOptions);
+        return { ...state, contactsInModal: fuse.search(action.payload), beforeSearchInModal: contactsInModal};
+      } else {
+        return { ...state, contactsInModal, beforeSearchInModal: null };
+      }
+    }
     case actionTypes.SELECT_CONTACT:
       return { ...state, selectedContactId: action.payload };
     case actionTypes.LOGOUT_LOCALLY:

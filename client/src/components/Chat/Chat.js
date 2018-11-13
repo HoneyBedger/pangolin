@@ -59,12 +59,14 @@ class Chat extends Component {
             <ChatBody chat={ this.props.chats.selectedChatId
                 ? this.props.chats.chats.filter(chat => chat._id === this.props.chats.selectedChatId)[0]
                 : this.props.chats.chats[0] }
-              contacts={this.props.contacts.contacts} user={this.props.user}
+              contacts={this.props.contacts.beforeSearch ? this.props.contacts.beforeSearch : this.props.contacts.contacts}
+              user={this.props.user}
               sendFirstMessage={this.props.sendFirstMessage}
-              sendMessage={this.props.sendMessage} />
+              sendMessage={this.props.sendMessage}
+              showModal={this.props.showModal} />
           </Column>
           <AvailableChats chats={this.props.chats.chats}
-            contacts={this.props.contacts.contacts}
+            contacts={this.props.contacts.beforeSearch ? this.props.contacts.beforeSearch : this.props.contacts.contacts}
             userId={this.props.user && this.props.user._id} />
           <Contacts contacts={this.props.contacts}
             showModal={this.props.showModal}

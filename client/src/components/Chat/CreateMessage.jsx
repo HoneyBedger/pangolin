@@ -44,6 +44,7 @@ const CreateMessage = ({ send }) => {
         <ButtonPrimary onClick={() => {
             if (messageInput.value && messageInput.value.trim() !== '')
               send(messageInput.value);
+            messageInput.value = '';
           }}>Send</ButtonPrimary>
       </div>
     </div>

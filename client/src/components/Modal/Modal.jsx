@@ -4,6 +4,7 @@ import { showModal, hideModal } from '../../actions/actionCreators';
 import AddContactModal from './AddContactModal';
 import ChangeNameModal from './ChangeNameModal';
 import UploadPictureModal from './UploadPictureModal';
+import AddPersonModal from './AddPersonModal';
 
 const mapStateToProps = (state) => state.modal;
 
@@ -17,7 +18,8 @@ const mapDispatchToProps = (dispatch) => ({
 const modalTypes = {
   'ADD_CONTACT': AddContactModal,
   'CHANGE_NAME': ChangeNameModal,
-  'UPLOAD_PICTURE': UploadPictureModal
+  'UPLOAD_PICTURE': UploadPictureModal,
+  'ADD_PERSON': AddPersonModal
 };
 
 export const Modal = ({ modalType, modalProps, hideModal }) => {

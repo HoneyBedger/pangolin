@@ -114,6 +114,13 @@ export const searchExistingChats = (searchString, contacts) => {
   };
 };
 
+export const selectChat = (id) =>  {
+  return {
+    type: actionTypes.SELECT_CHAT,
+    payload: id
+  };
+};
+
 
 //===USER===//
 export const fetchUser = (username, password) => (dispatch) => {

@@ -15,9 +15,8 @@ const ChatsColumn = styled(Column)`
   }
 `;
 
-const AvailableChats = ({ chats, contacts, userId, searchExistingChats }) => {
+const AvailableChats = ({ chats, contacts, userId, searchExistingChats, selectChat }) => {
   //sort chats by most recent message timestamp
-  console.log('In AvailableChats chats, contacts, userId', chats, contacts, userId);
 
   let searchInput;
   const search = () => {
@@ -33,8 +32,10 @@ const AvailableChats = ({ chats, contacts, userId, searchExistingChats }) => {
   else
     ChatList = (
       <List>
-        {chats.map(chat => (
-          <ListItem key={chat._id}>
+        {chats.chats.map(chat => (
+          <ListItem key={chat._id}
+            selected={chat._id === chats.selectedChatId}
+            onClick={() => selectChat(chat._id)} >
             {chat.users.map(id => {
               if (id === userId) return null;
               let contact = contacts.filter(contact => contact._id === id)[0];

@@ -93,6 +93,8 @@ const chats = (state = initialState, action) => {
         return { ...state, chats, beforeSearch: null };
       }
     }
+    case actionTypes.SELECT_CHAT:
+      return { ...state, selectedChatId: action.payload };
     default:
       return state;
   }

@@ -68,10 +68,11 @@ class Chat extends Component {
               sendMessage={this.props.sendMessage}
               showModal={this.props.showModal} />
           </Column>
-          <AvailableChats chats={this.props.chats.chats}
+          <AvailableChats chats={this.props.chats}
             contacts={this.props.contacts.beforeSearch ? this.props.contacts.beforeSearch : this.props.contacts.contacts}
             userId={this.props.user && this.props.user._id}
-            searchExistingChats={this.props.searchExistingChats} />
+            searchExistingChats={this.props.searchExistingChats}
+            selectChat={this.props.selectChat} />
           <Contacts contacts={this.props.contacts}
             showModal={this.props.showModal}
             searchContacts={this.props.searchContacts}

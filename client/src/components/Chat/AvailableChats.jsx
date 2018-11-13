@@ -15,15 +15,21 @@ const ChatsColumn = styled(Column)`
   }
 `;
 
-const AvailableChats = ({ chats, contacts, userId }) => {
+const AvailableChats = ({ chats, contacts, userId, searchExistingChats }) => {
   //sort chats by most recent message timestamp
   console.log('In AvailableChats chats, contacts, userId', chats, contacts, userId);
+
+  let searchInput;
+  const search = () => {
+    if (searchInput)
+      searchExistingChats(searchInput.value, contacts);
+  };
 
   let ChatList;
   if (!userId || !contacts || !chats)
     ChatList = <ErrorMessage style={{padding: '20px 7px 20px 14px', textAlign: 'left'}}>Sorry, something is wrong with your chats.</ErrorMessage>
   else if (chats.length === 0)
-    ChatList = <p style={{padding: '20px 7px 20px 14px', textAlign: 'left'}}>You do not have any chats yet.</p>
+    ChatList = <p style={{padding: '20px 7px 20px 14px', textAlign: 'left'}}>No chats.</p>
   else
     ChatList = (
       <List>
@@ -50,8 +56,10 @@ const AvailableChats = ({ chats, contacts, userId }) => {
     <ChatsColumn>
       <HeaderContainer style={{background: 'rgba(57, 66, 100, 0.5)'}}>
         <InputGroup>
-          <SearchInput placeholder='Search Chats'/>
-          <ButtonPrimary>
+          <SearchInput placeholder='Search Chats'
+            ref={(input) => searchInput = input}
+            onChange={search} />
+          <ButtonPrimary onClick={search}>
             <FontAwesomeIcon icon='search' />
           </ButtonPrimary>
         </InputGroup>

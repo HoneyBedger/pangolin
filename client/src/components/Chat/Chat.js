@@ -49,6 +49,9 @@ class Chat extends Component {
 
   render() {
     console.log('in chat showModal', this.props.showModal);
+    let allChats = this.props.chats.beforeSearch ?
+      this.props.chats.beforeSearch : this.props.chats.chats;
+
     return (
       <div id='chat'>
         <Logo />
@@ -57,8 +60,8 @@ class Chat extends Component {
             <ChatHeader name={this.props.user.name} picture={this.props.user.picture}
               logout={this.props.logout} showModal={this.props.showModal}/>
             <ChatBody chat={ this.props.chats.selectedChatId
-                ? this.props.chats.chats.filter(chat => chat._id === this.props.chats.selectedChatId)[0]
-                : this.props.chats.chats[0] }
+                ? allChats.filter(chat => chat._id === this.props.chats.selectedChatId)[0]
+                : allChats[0] }
               contacts={this.props.contacts.beforeSearch ? this.props.contacts.beforeSearch : this.props.contacts.contacts}
               user={this.props.user}
               sendFirstMessage={this.props.sendFirstMessage}
@@ -67,7 +70,8 @@ class Chat extends Component {
           </Column>
           <AvailableChats chats={this.props.chats.chats}
             contacts={this.props.contacts.beforeSearch ? this.props.contacts.beforeSearch : this.props.contacts.contacts}
-            userId={this.props.user && this.props.user._id} />
+            userId={this.props.user && this.props.user._id}
+            searchExistingChats={this.props.searchExistingChats} />
           <Contacts contacts={this.props.contacts}
             showModal={this.props.showModal}
             searchContacts={this.props.searchContacts}

@@ -107,6 +107,13 @@ export const addPersonToChat = (chatId, userId, token) => (dispatch, getState, e
   emit('ADD_PERSON_TO_CHAT', { chatId, userId, token });
 };
 
+export const searchExistingChats = (searchString, contacts) => {
+  return {
+    type: actionTypes.SEARCH_EXISTING_CHATS,
+    payload: { searchString, contacts }
+  };
+};
+
 
 //===USER===//
 export const fetchUser = (username, password) => (dispatch) => {

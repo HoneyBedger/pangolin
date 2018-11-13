@@ -50,7 +50,7 @@ const Contacts = ({ contacts, showModal, searchContacts,
         </ButtonInvisible>
       </HeaderContainer>
       {contacts.contacts.length === 0
-        ? <p style={{paddingLeft: '14px', paddingRight: '7px'}}>You do not have any contacts yet.</p>
+        ? <p style={{paddingLeft: '14px', paddingRight: '7px'}}>No contacts.</p>
         : <List>
             {contacts.contacts.map(contact => (
               <ListItem key={contact.username}

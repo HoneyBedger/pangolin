@@ -10,7 +10,7 @@ const initialState = {
 };
 
 const searchOptions = {
-  keys: ['name', 'username'], //!?
+  keys: ['namesForSearch.name', 'namesForSearch.username'],
   shouldSort: true,
   threshold: 0.3,
   maxPatternLength: 32,
@@ -78,6 +78,21 @@ const chats = (state = initialState, action) => {
     }
     case socketActionTypes.ADD_PERSON_TO_CHAT_FAILED:
       return state;
+    case actionTypes.SEARCH_EXISTING_CHATS: {
+      let chats = state.beforeSearch
+        ? state.beforeSearch
+        : state.chats.map(chat => {
+            let namesForSearch = action.payload.contacts.filter(c => chat.users.includes(c._id))
+              .map(c => ({ name: c.name, username: c.username }));
+            return { ...chat, namesForSearch };
+          });
+      if (action.payload.searchString.length >= 2 && action.payload.searchString.length <= 32) {
+        const fuse = new Fuse(chats, searchOptions);
+        return { ...state, chats: fuse.search(action.payload.searchString), beforeSearch: chats };
+      } else {
+        return { ...state, chats, beforeSearch: null };
+      }
+    }
     default:
       return state;
   }

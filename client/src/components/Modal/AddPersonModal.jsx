@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { searchContactsInModal, addPersonToChat, hideModal } from '../../actions/actionCreators';
+import { searchContactsInModal, addPersonToChat, addPersonToChatLocally, hideModal } from '../../actions/actionCreators';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Modal, ModalHeader, ModalBody } from './Elements';
 import { InputGroup, SearchInput, ButtonPrimary, ButtonInvisible, ButtonOutline } from '../Form/Elements';
@@ -19,6 +19,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   searchContactsInModal: (searchString) => dispatch(searchContactsInModal(searchString)),
   addPersonToChat: (chatId, userId, token) => dispatch(addPersonToChat(chatId, userId, token)),
+  addPersonToChatLocally: (chatId, userId) => dispatch(addPersonToChatLocally(chatId, userId)),
   hideModal: () => dispatch(hideModal())
 });
 
@@ -28,6 +29,7 @@ const AddPersonModal = ({
   token,
   searchContactsInModal,
   addPersonToChat,
+  addPersonToChatLocally,
   hideModal
 }) => {
 
@@ -76,7 +78,12 @@ const AddPersonModal = ({
                     picture={contact.picture && `data:${contact.picture.type};base64, ${contact.picture.data}`} />
                   {contact.name}
                 </div>
-                <ButtonOutline onClick={() => addPersonToChat(chat._id, contact._id, token)}>Add</ButtonOutline>
+                <ButtonOutline onClick={() => {
+                    if (chat.messages.length === 0)
+                      addPersonToChatLocally(chat._id, contact._id);
+                    else
+                      addPersonToChat(chat._id, contact._id, token);
+                    }}>Add</ButtonOutline>
               </ListItem> ))}
           </List>
         }

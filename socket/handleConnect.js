@@ -6,8 +6,7 @@ module.exports = function(client, clientManager, callback) {
   let username = client.handshake.headers['username'];
   User.findOne({ username })
   .populate('contacts', 'username name picture')
-  .select('username name picture contacts')
-  .lean()
+  .select('username name picture contacts newContacts')
   .then(res => {
     Chat.find({ users: res._id })
     .lean()
@@ -18,7 +17,7 @@ module.exports = function(client, clientManager, callback) {
       }
       if (!res) throw new Error('User not found.');
       let token = authentication.getToken({ _id: res._id, username });
-      let user = { ...res, token, tokenIsValid: true };
+      let user = { ...res._doc, token, tokenIsValid: true };
       clientManager.addClient(client, String(res._id));
       client.emit('CONNECTION_TO_SOCKET_SUCCESS', { user, chats });
       res.contacts.forEach(contact => {
@@ -26,6 +25,8 @@ module.exports = function(client, clientManager, callback) {
         if (contactSocket)
           client.to(`${contactSocket.id}`).emit('CONTACT_UPDATE', { username, online: true });
       });
+      res.newContacts = []; // assume the user sees the new contacts once connected
+      res.save();
       callback(null, { _id: res._id, username: res.username });
     })
     .catch(err => {

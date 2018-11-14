@@ -33,28 +33,24 @@ const chats = (state = initialState, action) => {
       if (existingChat[0]) return { ...state, selectedChatId: existingChat[0]._id };
       else { // create a new chat
         let newChat = {
-          _id: `${action.payload} ${state.userId}`, // just a temporary one, will be replaced once saved to DB
+          _id: (new Date()).getTime(), // just a temporary one, will be replaced once saved to DB
           users: [].concat([action.payload, state.userId]),
           messages: []
         };
         return { ...state, chats: state.chats.concat(newChat), selectedChatId: newChat._id };
       }
     case socketActionTypes.FIRST_MESSAGE_SUCCESS: {
-      let chatsToKeep = [], replacedChatId;
-      state.chats.forEach(chat => {
-        let chatIsReplaced = true;
-        for (let id of action.payload.users) {
-          if (!chat._id.includes(id)) {
-            chatsToKeep.push(chat);
-            chatIsReplaced = false;
-            break;
-          }
+      let chatExists = false;
+      let newChats = state.chats.map(chat => {
+        if (chat._id === action.payload.oldId) {
+          chatExists = true;
+          return action.payload.chat;
         }
-        if (chatIsReplaced) replacedChatId = chat._id;
+        else return chat;
       });
-      let newChat = action.payload;
-      return { ...state, chats: chatsToKeep.concat(newChat),
-        selectedChatId: state.selectedChatId === replacedChatId ? action.payload._id : state.selectedChatId };
+      if (!chatExists) newChats.push(action.payload.chat);
+      return { ...state, chats: newChats,
+        selectedChatId: state.selectedChatId === action.payload.oldId ? action.payload.chat._id : state.selectedChatId };
     }
     case socketActionTypes.FIRST_MESSAGE_FAILED:
       return state;
@@ -68,6 +64,17 @@ const chats = (state = initialState, action) => {
     }
     case socketActionTypes.MESSAGE_FAILED:
       return state;
+    case actionTypes.ADD_PERSON_TO_CHAT_LOCALLY: {
+      let newChats = state.chats.map(chat => {
+        if (chat._id === action.payload.chatId)
+          return {
+            ...chat,
+            users: chat.users.concat(action.payload.userId)
+          };
+        else return chat;
+      });
+      return { ...state, chats: newChats };
+    }
     case socketActionTypes.ADD_PERSON_TO_CHAT_SUCCESS: {
       let newChats = state.chats.map(chat => {
         if (chat._id === action.payload.chatId)

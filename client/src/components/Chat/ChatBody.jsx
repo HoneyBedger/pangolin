@@ -51,7 +51,7 @@ const ChatBody = ({ chat, contacts, user, sendFirstMessage, sendMessage, showMod
   if (!chat) return <p style={{padding: '20px 7px 20px 27px'}}>Select a person and start messaging!</p>
 
   const send = (content) => {
-    if (chat.messages.length == 0) sendFirstMessage(chat.users, content, user.token);
+    if (chat.messages.length == 0) sendFirstMessage(chat._id, chat.users, content, user.token);
     else sendMessage(chat._id, content, user.token);
   };
 

@@ -20,9 +20,14 @@ const searchOptions = {
 
 const contacts = (state = initialState, action) => {
   switch (action.type) {
-    case socketActionTypes.CONNECTION_TO_SOCKET_SUCCESS:
-      return { ...state, contacts: action.payload.user.contacts,
-        contactsInModal: action.payload.user.contacts };
+    case socketActionTypes.CONNECTION_TO_SOCKET_SUCCESS: {
+      let contacts = action.payload.user.contacts.map(c => {
+        if (action.payload.user.newContacts.includes(c._id))
+          return { ...c, new: true };
+        else return c;
+      });
+      return { ...state, contacts, contactsInModal: contacts };
+    }
     case socketActionTypes.CONNECTION_TO_SOCKET_FAILED:
       return initialState;
     case actionTypes.ADD_CONTACT_LOCALLY:
@@ -56,8 +61,19 @@ const contacts = (state = initialState, action) => {
         return { ...state, contactsInModal, beforeSearchInModal: null };
       }
     }
-    case actionTypes.SELECT_CONTACT:
-      return { ...state, selectedContactId: action.payload };
+    case actionTypes.SELECT_CONTACT: {
+      let selectedContact = state.contacts.filter(c => c._id === action.payload)[0];
+      if (selectedContact.new) {
+        return {
+          ...state,
+          contacts: state.contacts.map(c => {
+            if (c._id === action.payload) return { ...c, new: false };
+            else return c;
+          }),
+          selectedContactId: action.payload
+      };
+      } else return { ...state, selectedContactId: action.payload };
+    }
     case actionTypes.LOGOUT_LOCALLY:
       return initialState;
     default:

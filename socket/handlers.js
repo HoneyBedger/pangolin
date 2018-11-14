@@ -5,6 +5,28 @@ const Chat = require('../models/chats');
 
 module.exports = function (_id, username, client, clientManager, chatManager) {
 
+  const addContactOneSide = (userId, idsToAdd, callback) => {
+    console.log('adding ids', idsToAdd, ' to contacts of', userId);
+    let userSocket = clientManager.getClient(String(userId));
+    User.findByIdAndUpdate(userId,
+      { $push: { contacts: idsToAdd, newContacts: userSocket ? [] : idsToAdd } },
+      { new: true })
+    .then(updatedUser => {
+      if (userSocket) {
+        User.find({ '_id': { $in: idsToAdd}})
+        .then(newContacts => {
+          newContacts.forEach(newContact => {
+            let { _id, username, name, picture } = newContact;
+            let newContactSocket = clientManager.getClient(String(newContact._id));
+            userSocket.emit('NEW_CONTACT', { _id, username, name, picture, online: !!newContactSocket });
+          });
+          callback(null);
+        });
+      } else callback(null);
+    }).catch(err => callback(err));
+  };
+
+
 
   const handleAddContact = ({ usernameToAdd, token }) => {
     console.log('Adding contact:', usernameToAdd);
@@ -86,13 +108,28 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
     });
   };
 
-  const handleFirstMessage = ({ users, content, token }) => {
+  const handleFirstMessage = ({ chatId, users, content, token }) => {
     console.log('received first message');
     const notifyOfNewChat = (chat) => {
       users.forEach(id => {
         let userSocket = clientManager.getClient(String(id));
-        if (userSocket) // if the user is online
-          userSocket.emit('FIRST_MESSAGE_SUCCESS', chat);
+        // check if this user has all the other ones in the chat as contacts
+        // if not, add contact
+        User.findById(id)
+        .then(thisUser => {
+          let idsToAdd = [];
+          for (let otherId of users) {
+            console.log('this user contacts', thisUser.contacts);
+            if (otherId !== id && thisUser.contacts.indexOf(otherId) === -1)
+              idsToAdd.push(otherId);
+          }
+          addContactOneSide(thisUser._id, idsToAdd, (err) => {
+            if (err) throw new Error(err.message);
+            else if (userSocket) // if the user is online
+              userSocket.emit('FIRST_MESSAGE_SUCCESS', { chat, oldId: chatId });
+          })
+        })
+        .catch(err => {throw new Error(err.message)});
       });
     };
 
@@ -113,6 +150,8 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
     })
     .catch(err => client.emit('FIRST_MESSAGE_FAILED', err.message));
   };
+
+
 
   const handleMessage = ({ chatId, content, token }) => {
     if (!authentication.tokenOK(token)) return;
@@ -140,55 +179,36 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
     Chat.findById(chatId)
     .then(chat => {
       if (!chat) throw new Error('Chat not found.');
+      else if (chat.users.indexOf(userId) !== -1) throw new Error('User already added.');
       else {
         chat.users.push(userId);
         chat.save()
         .then(updatedChat => {
           updatedChat.users.forEach(id => {
             User.findById(id)
-            .then(participant => {
-              for (let userId of updatedChat.users) {
-                if (userId !== user._id && !participant.contacts.includes(String(userId)))
-                  addContactOneSide(participant, userId, (err) => {
-                    if (err) throw new Error(err.mesage);
-                    let userSocket = clientManager.getClient(String(id));
-                    if (userSocket)
-                      userSocket.emit('ADD_PERSON_TO_CHAT_SUCCESS', { chatId, userId });
-                  });
-                else {
-                  let userSocket = clientManager.getClient(String(id));
-                  if (userSocket)
+            .then(user => {
+              let userSocket = clientManager.getClient(String(user._id));
+              if (user._id != userId && user.contacts.indexOf(userId) === -1) {
+                addContactOneSide(user._id, [userId], (err) => {
+                  if (!err && userSocket)
                     userSocket.emit('ADD_PERSON_TO_CHAT_SUCCESS', { chatId, userId });
-                }
-              }
-            })
+                });
+              } else if (user._id == userId) {
+                addContactOneSide(user._id,
+                  chat.users.filter(oldId => (oldId != user._id && user.contacts.indexOf(oldId) === -1)),
+                  (err) => {
+                  if (!err && userSocket)
+                    userSocket.emit('FIRST_MESSAGE_SUCCESS', { chat: updatedChat, oldId: null });
+                });
+              } else if (userSocket)
+                userSocket.emit('ADD_PERSON_TO_CHAT_SUCCESS', { chatId, userId });
+            }).catch(err => {throw new Error(err.message)})
           });
-        })
-        .catch(err => {throw new Error(err.message)});
+        }).catch(err => {throw new Error(err.message)});
       }
-    })
-    .catch(err => socket.emit('ADD_PERSON_TO_CHAT_FAILED', err.message));
+    }).catch(err => socket.emit('ADD_PERSON_TO_CHAT_FAILED', err.message));
   };
 
-  const addContactOneSide = (user, idToAdd, callback) => {
-    user.contacts.push(idToAdd);
-    let userSocket = clientManager.getClient(String(user._id));
-    if (!userSocket) user.newContacts.push(idToAdd);
-    user.save()
-    .then(updatedUser => {
-      User.findById(idToAdd)
-      .lean()
-      .then(newContact => {
-        let { _id, username, name, picture } = newContact;
-        let newContactSocket = clientManager.getClient(String(newContact._id));
-        if (userSocket)
-          userSocket.emit('NEW_CONTACT', { _id, username, name, picture, online: !!newContactSocket });
-        callback(null);
-      })
-      .catch(err => callback(err));
-    })
-    .catch(err => callback(err));
-  };
 
   const handleLogout = () => {
     console.log(username, " logged out");

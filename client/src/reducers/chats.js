@@ -21,8 +21,7 @@ const chats = (state = initialState, action) => {
   switch (action.type) {
     case socketActionTypes.CONNECTION_TO_SOCKET_SUCCESS: {
       let chats = action.payload.chats;
-      return { ...state, chats, userId: action.payload.user._id,
-        selectedChatId: (chats.length > 0 ? chats[0]._id : null)};
+      return { ...state, chats, userId: action.payload.user._id };
     }
     case socketActionTypes.CONNECTION_TO_SOCKET_FAILED:
       return initialState;
@@ -57,7 +56,8 @@ const chats = (state = initialState, action) => {
     case socketActionTypes.MESSAGE_SUCCESS: {
       let newChats = state.chats.map(chat => {
         if (chat._id === action.payload.chatId)
-          return { ...chat, messages: chat.messages.concat(action.payload.message) };
+          return { ...chat, messages: chat.messages.concat(action.payload.message),
+            numUnseenMsgs: state.selectedChatId === chat._id ? 0 : chat.numUnseenMsgs + 1 };
         else return chat;
       });
       return { ...state, chats: newChats };
@@ -102,6 +102,13 @@ const chats = (state = initialState, action) => {
     }
     case actionTypes.SELECT_CHAT:
       return { ...state, selectedChatId: action.payload };
+    case actionTypes.RESET_UNSEEN_MESSAGES_LOCALLY: {
+      let newChats = state.chats.map(chat => {
+        if (chat._id === action.payload) return { ...chat, numUnseenMsgs: 0 };
+        else return chat;
+      });
+      return { ...state, chats: newChats };
+    }
     default:
       return state;
   }

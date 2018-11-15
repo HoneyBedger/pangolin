@@ -128,6 +128,18 @@ export const selectChat = (id) =>  {
   };
 };
 
+export const resetUnseenMsgs = (chatId, token) => (dispatch, getState, emit) => {
+  dispatch(resetUnseenMsgsLocally(chatId));
+  emit('RESET_UNSEEN_MESSAGES', { chatId, token });
+};
+
+export const resetUnseenMsgsLocally = (id) => {
+  return {
+    type: actionTypes.RESET_UNSEEN_MESSAGES_LOCALLY,
+    payload: id
+  };
+};
+
 
 //===USER===//
 export const fetchUser = (username, password) => (dispatch) => {

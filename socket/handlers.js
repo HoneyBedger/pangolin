@@ -126,7 +126,9 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
           addContactOneSide(thisUser._id, idsToAdd, (err) => {
             if (err) throw new Error(err.message);
             else if (userSocket) // if the user is online
-              userSocket.emit('FIRST_MESSAGE_SUCCESS', { chat, oldId: chatId });
+              userSocket.emit('FIRST_MESSAGE_SUCCESS', {
+                chat: { ...chat, numUnseenMsgs: chat.numUnseenMsgs.filter(obj => String(obj.userId) == String(res._id))[0].numUnseen},
+                oldId: chatId });
           })
         })
         .catch(err => {throw new Error(err.message)});
@@ -137,12 +139,19 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
     Chat.findOne({ users })
     .then(res => {
       if (!res) { // such a chat doesn't exist yet
-        let newChat = new Chat({ users, messages: [{ from: _id, content }] });
+        let newChat = new Chat({
+          users,
+          messages: [{ from: _id, content }],
+          numUnseenMsgs: users.map(id => ({ userId: id, numUnseen: id == _id ? 0 : 1 }))
+        });
         newChat.save()
         .then(chat => notifyOfNewChat(chat))
         .catch(err => {throw new Error(err.message)});
       } else { // a chat already exists (if two users tried to create a chat approx at the same time)
         res.messages.push({ from: _id, content });
+        for (let obj of res.numUnseenMsgs) {
+          if (obj.userId != _id) obj.numUnseen ++;
+        }
         res.save()
         .then(chat => notifyOfNewChat(chat))
         .catch(err => {throw new Error(err.message)});
@@ -160,6 +169,9 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
       if (!chat) throw new Error('Chat not found.');
       else {
         chat.messages.push({ from: _id, content});
+        for (let obj of chat.numUnseenMsgs) {
+          if (obj.userId != _id) obj.numUnseen ++;
+        }
         chat.save()
         .then(updatedChat => {
           updatedChat.users.forEach(id => {
@@ -174,6 +186,8 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
     .catch(err => socket.emit('MESSAGE_FAILED', err.message));
   };
 
+
+
   const handleAddPersonToChat = ({ chatId, userId, token }) => {
     if (!authentication.tokenOK(token)) return;
     Chat.findById(chatId)
@@ -182,6 +196,7 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
       else if (chat.users.indexOf(userId) !== -1) throw new Error('User already added.');
       else {
         chat.users.push(userId);
+        chat.numUnseenMsgs.push({ userId, numUnseen: 0});
         chat.save()
         .then(updatedChat => {
           updatedChat.users.forEach(id => {
@@ -209,6 +224,19 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
     }).catch(err => socket.emit('ADD_PERSON_TO_CHAT_FAILED', err.message));
   };
 
+  const handleResetUnseenMsgs = ({ chatId, token }) => {
+    if (!authentication.tokenOK(token)) return;
+    Chat.findById(chatId)
+    .then(chat => {
+      for (let obj of chat.numUnseenMsgs) {
+        if (String(obj.userId) === String(_id)) {
+          obj.numUnseen = 0;
+          break;
+        }
+      }
+      chat.save();
+    }).catch(err => console.log('In RESET_UNSEEN_MESSAGES Error: ', err.message));
+  };
 
   const handleLogout = () => {
     console.log(username, " logged out");
@@ -237,6 +265,7 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
     handleChangeName,
     handleFirstMessage,
     handleAddPersonToChat,
+    handleResetUnseenMsgs,
     handleLogout,
     handleMessage,
     handleDisconnect

@@ -10,14 +10,16 @@ module.exports = function(client, clientManager, callback) {
   .then(res => {
     Chat.find({ users: res._id })
     .lean()
-    .then(chats => {
-      for (let c of res.contacts) {
-        if (clientManager.getClient(String(c._id)))
-          c.online = true;
-      }
+    .then(chatsRes => {
       if (!res) throw new Error('User not found.');
+      let chats = chatsRes.map(chat => ({
+         ...chat, numUnseenMsgs: chat.numUnseenMsgs.filter(obj => String(obj.userId) === String(res._id))[0].numUnseen
+       }));
+      let contacts = res.contacts.map(c => (
+        { ...c._doc, online: !!clientManager.getClient(String(c._id))}
+      ));
       let token = authentication.getToken({ _id: res._id, username });
-      let user = { ...res._doc, token, tokenIsValid: true };
+      let user = { ...res._doc, contacts, token, tokenIsValid: true };
       clientManager.addClient(client, String(res._id));
       client.emit('CONNECTION_TO_SOCKET_SUCCESS', { user, chats });
       res.contacts.forEach(contact => {

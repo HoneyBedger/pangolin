@@ -43,7 +43,11 @@ const Badge = styled.p`
   background-color: #11a8ab;
   border-radius: 10px;
   color: #fff;
-  padding: 5px;
+  padding: 4px;
 `;
 
-export { List, ListItem, Badge };
+const MessageBadge = styled(Badge)`
+  background-color: #cc324b;
+`;
+
+export { List, ListItem, Badge, MessageBadge };

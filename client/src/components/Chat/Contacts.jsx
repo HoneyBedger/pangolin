@@ -9,9 +9,7 @@ import { InputGroup, SearchInput, ButtonPrimary,
 import { List, ListItem, Badge } from './ListElements';
 
 const ContactsColumn = styled(Column)`
-  @media (max-width: 991px) {
-    display: none;
-  }
+  
 `;
 
 const Contacts = ({ contacts, showModal, searchContacts,
@@ -19,8 +17,6 @@ const Contacts = ({ contacts, showModal, searchContacts,
 
   console.log('selectContact is', selectContact, 'showModal is', showModal);
 
-  //TODO: need to select the 1st contact by default if there are no chats.
-  // maybe do it in componentDidMount?
 
   contacts.contacts.sort((c1, c2) => {
     if (c1.name === c2.name) return 0;

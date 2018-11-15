@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ProfilePicture from './ProfilePicture';
@@ -46,49 +46,71 @@ const MessageHistory = styled.div`
   }
 `;
 
-const ChatBody = ({ chat, contacts, user, sendFirstMessage, sendMessage, showModal }) => {
+class ChatBody extends Component {
 
-  if (!chat) return <p style={{padding: '20px 7px 20px 27px'}}>Select a person and start messaging!</p>
+  constructor(props) {
+    super(props);
+    this.send = this.send.bind(this);
+  }
 
-  const send = (content) => {
+  send(content) {
+    let { chat, user, sendFirstMessage, sendMessage } = this.props;
     if (chat.messages.length == 0) sendFirstMessage(chat._id, chat.users, content, user.token);
     else sendMessage(chat._id, content, user.token);
-  };
+  }
 
-  console.log('in Chat Body chat, contacts', chat, contacts);
-  const participants = chat.users.filter(id => id !== user._id)
-  .map(id => {
-    let contact = contacts.filter(contact => contact._id === id)[0];
-    return contact.name;
-  }).join(', ');
+  componentDidUpdate(prevProps) {
+    //console.log('chat body updated:', prevProps.chat._id, this.props.chat._id, prevProps.chat.messages.length, this.props.chat.messages.length);
+    if (prevProps.chat._id === this.props.chat._id &&
+      prevProps.chat.messages.length < this.props.chat.messages.length) {
+        this.props.resetUnseenMsgs(this.props.chat._id, this.props.user.token);
+      }
+  }
 
-  chat.messages.sort((m1, m2) => new Date(m1.updatedAt) - new Date(m2.updatedAt));
-  console.log('in ChatBody messages:', chat.messages.map(msg => {
-    return { ...msg, updatedAt: new Date(msg.updatedAt)};
-  }));
-  //TODO: set initial scrolling position to end
+  render() {
+    let { chat, contacts, user, sendFirstMessage, sendMessage, showModal, resetUnseenMsgs } = this.props;
 
-  return (
-    <ChatBodyContainer>
-      <ChatBodyHeader>
-        <HeaderH3>{participants}</HeaderH3>
-        <ButtonInvisible style={{lineHeight: '39px'}}
-          onClick={() => showModal('ADD_PERSON')}>
-          <FontAwesomeIcon icon='plus'/> Add person
-        </ButtonInvisible>
-      </ChatBodyHeader>
-      <MessageHistory>
-        {chat.messages.map((msg, i) => {
-          let fromContact = (msg.from === user._id)
-            ? user
-            : contacts.filter(contact => contact._id === msg.from)[0];
-          return <Message key={i} msg={msg}
-            fromContact={fromContact} fromMe={msg.from === user._id}/>;
-        })}
-      </MessageHistory>
-      <CreateMessage send={send} />
-    </ChatBodyContainer>
-  );
+    if (!chat) return <p style={{padding: '20px 7px 20px 27px'}}>Select a person and start messaging!</p>;
+
+
+    console.log('in Chat Body chat, contacts', chat, contacts);
+    const participants = chat.users.filter(id => id !== user._id)
+    .map(id => {
+      let contact = contacts.filter(contact => contact._id === id)[0];
+      return contact.name;
+    }).join(', ');
+
+    chat.messages.sort((m1, m2) => new Date(m1.updatedAt) - new Date(m2.updatedAt));
+
+    //scroll messages to bottom
+    setTimeout(() => {
+      let messageHistory = document.getElementById("message_history");
+      messageHistory.scrollTop = messageHistory.scrollHeight;
+    }, 100);
+
+    return (
+      <ChatBodyContainer>
+        <ChatBodyHeader>
+          <HeaderH3>{participants}</HeaderH3>
+          <ButtonInvisible style={{lineHeight: '39px'}}
+            onClick={() => showModal('ADD_PERSON')}>
+            <FontAwesomeIcon icon='plus'/> Add person
+          </ButtonInvisible>
+        </ChatBodyHeader>
+        <MessageHistory id="message_history">
+          {chat.messages.map((msg, i) => {
+            let fromContact = (msg.from === user._id)
+              ? user
+              : contacts.filter(contact => contact._id === msg.from)[0];
+            return <Message key={i} msg={msg}
+              fromContact={fromContact} fromMe={msg.from === user._id}/>;
+          })}
+        </MessageHistory>
+        <CreateMessage send={this.send} />
+      </ChatBodyContainer>
+    );
+  }
+
 };
 
 export default ChatBody;

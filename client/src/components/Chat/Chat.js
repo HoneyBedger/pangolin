@@ -66,13 +66,16 @@ class Chat extends Component {
               user={this.props.user}
               sendFirstMessage={this.props.sendFirstMessage}
               sendMessage={this.props.sendMessage}
-              showModal={this.props.showModal} />
+              showModal={this.props.showModal}
+              resetUnseenMsgs={this.props.resetUnseenMsgs} />
           </Column>
           <AvailableChats chats={this.props.chats}
             contacts={this.props.contacts.beforeSearch ? this.props.contacts.beforeSearch : this.props.contacts.contacts}
             userId={this.props.user && this.props.user._id}
+            token={this.props.user && this.props.user.token}
             searchExistingChats={this.props.searchExistingChats}
-            selectChat={this.props.selectChat} />
+            selectChat={this.props.selectChat}
+            resetUnseenMsgs={this.props.resetUnseenMsgs} />
           <Contacts contacts={this.props.contacts}
             showModal={this.props.showModal}
             searchContacts={this.props.searchContacts}

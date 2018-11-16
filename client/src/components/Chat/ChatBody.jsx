@@ -61,7 +61,7 @@ class ChatBody extends Component {
 
   componentDidUpdate(prevProps) {
     //console.log('chat body updated:', prevProps.chat._id, this.props.chat._id, prevProps.chat.messages.length, this.props.chat.messages.length);
-    if (prevProps.chat._id === this.props.chat._id &&
+    if (this.props.chat && prevProps.chat._id === this.props.chat._id &&
       prevProps.chat.messages.length < this.props.chat.messages.length) {
         this.props.resetUnseenMsgs(this.props.chat._id, this.props.user.token);
       }

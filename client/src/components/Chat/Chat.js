@@ -27,22 +27,16 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 const ChatGrid = styled.section`
-  background: rgba(0, 0, 0, 0.3);
   height: 80vh;
   min-height: 300px;
-  min-width: 288px;
+  min-width: 370px;
   width: 96%;
   margin: auto;
   margin-top: 20px;
   margin-bottom: 50px;
   display: grid;
-  grid-template-columns: 54% 23% 23%;
-  @media (max-width: 991px) {
-    grid-template-columns: 70% 30%;
-  }
-  @media (max-width: 767px) {
-    grid-template-columns: 100%;
-  }
+  grid-template-columns: minmax(335px, 54%) minmax(220px, 23%) minmax(220px, 23%);
+
 `;
 
 class Chat extends Component {

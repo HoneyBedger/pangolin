@@ -9,14 +9,11 @@ import { InputGroup, SearchInput, ButtonPrimary,
 import { List, ListItem, Badge } from './ListElements';
 
 const ContactsColumn = styled(Column)`
-  
+
 `;
 
 const Contacts = ({ contacts, showModal, searchContacts,
   searchExistingContacts, selectContact }) => {
-
-  console.log('selectContact is', selectContact, 'showModal is', showModal);
-
 
   contacts.contacts.sort((c1, c2) => {
     if (c1.name === c2.name) return 0;

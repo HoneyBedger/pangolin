@@ -7,6 +7,7 @@ import { fetchUser, registerUser } from '../actions/actionCreators';
 import Logo from './Logo';
 import SignIn from './SignIn';
 import SignUp from './SignUp';
+import { FormHeader } from './Form/Elements';
 import Loading from './Loading';
 import ErrorMessage from './ErrorMessage';
 
@@ -49,13 +50,21 @@ class Login extends Component {
           <Logo/>
           <ErrorMessage>{user.socketErrMessage}</ErrorMessage>
           <LoginGrid>
-            <SignIn login={(username, password) => {
-                this.props.fetchUser(username, password);
-              }}
-              errMessage={user.loginErrMessage}/>
-            <SignUp register={(username, password, name) => {
-                this.props.registerUser(username, password, name);
-              }} errMessage={user.registerErrMessage} />
+            <div>
+              <FormHeader>Sign In</FormHeader>
+              <SignIn onSubmit={(values) => {
+                  console.log('in login:', values);
+                  this.props.fetchUser(values.signinEmail.trim(), values.signinPassword.trim());
+                }}
+                errMessage={user.loginErrMessage}/>
+            </div>
+            <div>
+              <FormHeader>Sign Up</FormHeader>
+              <SignUp onSubmit={(values) => {
+                  console.log('registering user', values);
+                  this.props.registerUser(values.email.trim(), values.password.trim(), values.name.trim());
+                }} errMessage={user.registerErrMessage} />
+            </div>
           </LoginGrid>
         </React.Fragment>
       );

@@ -46,8 +46,11 @@ const UploadPictureModal = ({
         <div/>
         <ButtonPrimary style={{gridColumn: '2/3'}} disabled={isLoading}
           onClick={() => {
-            changeName(nameInput.value, token);
-            nameInput.value = '';
+            if (nameInput && nameInput.value
+              && nameInput.value.trim().length > 0 && nameInput.value.trim().length < 20) {
+                changeName(nameInput.value.trim(), token);
+                nameInput.value = '';
+            }
           }}>Change</ButtonPrimary>
         </SignGrid>
         {isLoading && <LoadingSmall/>}

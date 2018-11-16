@@ -1,4 +1,6 @@
+import React from 'react';
 import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const FormHeader = styled.h2`
   text-align: center;
@@ -24,6 +26,8 @@ const InputGroup = styled.div`
   flex-direction: row;
   align-items: flex-end;
   color: #9099b7;
+  flex: 2 2 auto;
+  box-sizing: border-box;
 `;
 
 const Input = styled.input`
@@ -47,10 +51,31 @@ const Input = styled.input`
     }
 `;
 
+const FormErrorMessage = styled.p`
+  color: #ac2a3f;
+  font-size: 0.8rem;
+  margin: 0;
+  padding: 3px 0 0 0;
+  text-align: center;
+`;
+
+const ValidatedInput = ({ input, id, type, icon, placeholder, meta: { touched, error }}) => {
+  return (
+    <div>
+      <InputGroup>
+        <FontAwesomeIcon icon={icon} />
+        <Input {...input} type={type} id={id} placeholder={placeholder} />
+      </InputGroup>
+      {touched && error && <FormErrorMessage>{error}</FormErrorMessage>}
+    </div>
+  );
+};
+
 const SearchInput = styled(Input)`
   border-bottom: solid 1px #e64c65;
   box-shadow: none;
   margin-right: 0px;
+  flex: 2 2 auto;
   &:focus {
     box-shadow: none;
   }
@@ -80,6 +105,9 @@ const Label = styled.label`
 const Button = styled.button`
   padding: 8px;
   color: #fff;
+  box-sizing: border-box;
+  min-width: 10px;
+  flex: 0 0 auto;
   &:hover {
     cursor: pointer;
   }
@@ -147,5 +175,5 @@ const ButtonInvisible = styled(Button)`
   }
 `;
 
-export { SignForm, SignGrid, FormHeader, InputGroup, Input, SearchInput,
+export { SignForm, SignGrid, FormHeader, InputGroup, Input, ValidatedInput, SearchInput,
   FileInputWrapper, Label, Button, ButtonPrimary, ButtonOutline, ButtonInvisible };

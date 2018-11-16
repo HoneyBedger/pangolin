@@ -1,42 +1,36 @@
 import React from 'react';
-import styled from 'styled-components';
-import { SignForm, SignGrid, FormHeader, InputGroup, Input,
-  Label, ButtonPrimary } from './Form/Elements';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Field, reduxForm } from 'redux-form';
+import { SignForm, SignGrid, ValidatedInput,  Label, ButtonPrimary } from './Form/Elements';
 import ErrorMessage from './ErrorMessage';
 
 
-const SignIn = ({ login, errMessage }) => {
-  let username, password;
+// Validators
+const required = value => value ? undefined : 'Required';
+const minLength5 = value => !value || value.length < 5 ? 'Must be at least 5 characters' : undefined;
+const email = value =>
+  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value) ?
+  'Invalid email address' : undefined;
+
+
+const SignIn = ({ handleSubmit, errMessage, pristine, reset, submitting }) => {
+  let password;
   return (
-    <div>
-      <FormHeader>Sign In</FormHeader>
-      <SignForm>
-        {errMessage && <ErrorMessage>{errMessage}</ErrorMessage>}
-        <SignGrid>
-          <Label htmlFor="signinEmail">Email</Label>
-          <InputGroup>
-            <FontAwesomeIcon icon="envelope" />
-            <Input type="email" id="signinEmail" placeholder="Email"
-              ref={(input) => {username = input}} >
-            </Input>
-          </InputGroup>
-          <Label htmlFor="signinPassword">Password</Label>
-          <InputGroup>
-            <FontAwesomeIcon icon="unlock" />
-            <Input type="password" id="signinPassword" placeholder="Password"
-              ref={(input) => {password = input}} />
-          </InputGroup>
-          <ButtonPrimary style={{gridColumn: '2/3'}}
-            onClick={(e) => {
-              e.preventDefault();
-              login(username.value, password.value);
-            }}>Sign In</ButtonPrimary>
-        </SignGrid>
-      </SignForm>
-    </div>
+    <SignForm onSubmit={handleSubmit}>
+      {errMessage && <ErrorMessage>{errMessage}</ErrorMessage>}
+      <SignGrid>
+        <Label htmlFor="signinEmail">Email</Label>
+        <Field name="signinEmail" type="email" id="signinEmail" placeholder="Email"
+          icon="envelope" component={ValidatedInput} validate={[required, email]} />
+        <Label htmlFor="signinPassword">Password</Label>
+        <Field name="signinPassword" type="password" id="signinPassword"
+          placeholder="Password" icon="unlock" component={ValidatedInput}
+          validate={[required, minLength5]} />
+        <ButtonPrimary type="submit" style={{gridColumn: '2/3'}}
+          disabled={submitting}>Sign In</ButtonPrimary>
+      </SignGrid>
+    </SignForm>
   );
 };
 
 
-export default SignIn;
+export default reduxForm({ form: 'signIn' })(SignIn);

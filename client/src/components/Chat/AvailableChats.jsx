@@ -10,12 +10,7 @@ import ErrorMessage from '../ErrorMessage';
 
 const ChatsColumn = styled(Column)`
   border-right: solid 1px #1f253d;
-  @media (max-width: 991px) {
-    display: none;
-  }
-  @media (max-width: 767px) {
-    display: none;
-  }
+
 `;
 
 class AvailableChats extends Component {
@@ -42,7 +37,7 @@ class AvailableChats extends Component {
       else if (lastMsgTime2) return 1;
       else return 0;
     });
-    if (!chats.selectedChatId) selectChat(chats.chats[0]._id);
+    if (!chats.selectedChatId && chats.chats[0]) selectChat(chats.chats[0]._id);
 
 
     let ChatList;

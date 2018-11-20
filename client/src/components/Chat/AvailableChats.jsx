@@ -21,7 +21,7 @@ class AvailableChats extends Component {
   };
 
   render () {
-    let { chats, contacts, userId, token, searchExistingChats, selectChat,
+    let { chats, contacts, userId, token, selectChat,
       resetUnseenMsgs, smallDeviceDisplay } = this.props;
 
     const ChatsColumn = styled(Column)`

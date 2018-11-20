@@ -11,7 +11,7 @@ const smallDeviceDisplay = (state = initialState, action) => {
       return { ...state, showContacts: !state.showContacts };
     default:
       return state;
-  };
+  }
 };
 
 export default smallDeviceDisplay;

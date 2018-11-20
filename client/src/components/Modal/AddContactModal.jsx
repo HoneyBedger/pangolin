@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { searchContacts, addContact, clearContactSearch, hideModal } from '../../actions/actionCreators';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Modal, ModalHeader, ModalBody } from './Elements';
-import { InputGroup, SearchInput, ButtonPrimary, ButtonInvisible, ButtonOutline } from '../Form/Elements';
+import { InputGroup, SearchInput, ButtonPrimary, ButtonOutline } from '../Form/Elements';
 import { List, ListItem } from '../Chat/ListElements';
 import ErrorMessage from '../ErrorMessage';
 import LoadingSmall from '../LoadingSmall';

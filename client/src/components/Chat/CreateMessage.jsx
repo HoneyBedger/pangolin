@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ButtonPrimary, ButtonInvisible } from '../Form/Elements';
+import { ButtonPrimary } from '../Form/Elements';
 
 const MessageInput = styled.textarea`
   box-sizing: border-box;

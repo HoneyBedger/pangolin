@@ -1,6 +1,4 @@
 import actionTypes from './actionTypes';
-import socketActionTypes from './socketActionTypes';
-import { connectToSocket } from '../socketClient';
 
 
 //===MODAL===//

@@ -13,7 +13,7 @@ const email = value =>
 
 
 const SignIn = ({ handleSubmit, errMessage, pristine, reset, submitting }) => {
-  let password;
+
   return (
     <SignForm onSubmit={handleSubmit}>
       {errMessage && <ErrorMessage>{errMessage}</ErrorMessage>}

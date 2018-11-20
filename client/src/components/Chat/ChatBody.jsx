@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import ProfilePicture from './ProfilePicture';
 import Message from './Message';
 import CreateMessage from './CreateMessage';
 import { ButtonInvisible } from '../Form/Elements';
@@ -55,7 +54,7 @@ class ChatBody extends Component {
 
   send(content) {
     let { chat, user, sendFirstMessage, sendMessage } = this.props;
-    if (chat.messages.length == 0) sendFirstMessage(chat._id, chat.users, content, user.token);
+    if (chat.messages.length === 0) sendFirstMessage(chat._id, chat.users, content, user.token);
     else sendMessage(chat._id, content, user.token);
   }
 
@@ -67,8 +66,7 @@ class ChatBody extends Component {
   }
 
   render() {
-    let { chat, contacts, user, sendFirstMessage, sendMessage,
-      showModal, resetUnseenMsgs } = this.props;
+    let { chat, contacts, user, showModal } = this.props;
 
     if (!chat) return <p style={{padding: '20px 7px 20px 27px'}}>Select a person and start messaging!</p>;
 

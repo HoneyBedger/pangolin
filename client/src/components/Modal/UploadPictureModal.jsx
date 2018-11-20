@@ -38,7 +38,7 @@ const UploadPictureModal = ({ token, warning, error, picture, name, isLoading,
       uploadPictureWarning('Please select a file.');
       return false;
     }
-    let extension = fileInput.value.match(/\.([^\.]+)$/)[1];
+    let extension = fileInput.value.match(/\.([^.]+)$/)[1];
     let allowedExtensions = ['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'];
     if (!allowedExtensions.includes(extension)) {
       uploadPictureWarning('Please select a jpg or png file.');

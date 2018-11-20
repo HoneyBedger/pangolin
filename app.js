@@ -32,7 +32,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(passport.initialize());
 
-app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, "client", "build")));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

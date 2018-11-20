@@ -11,7 +11,8 @@ const defaultState = {
   contacts: {},
   chats: {},
   modal: {},
-  searchContacts: {}
+  searchContacts: {},
+  smallDeviceDisplay: {}
 };
 const store = createStore(
   connectRouter(history)(rootReducer),

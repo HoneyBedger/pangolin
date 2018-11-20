@@ -17,15 +17,28 @@ const ButtonInvisibleHideSmall = styled(ButtonInvisible)`
   }
 `;
 
-const ChatHeader = ({ name, picture, logout, showModal }) => {
+const ChatHeader = ({ name, picture, logout, showModal, toggleAvailableChats, toggleContacts }) => {
+
   return (
     <HeaderContainer>
       <h3 style={{margin: '0 20px', fontWeight: 'normal'}}>{name}</h3>
       <div>
-        <ButtonInvisibleHideSmall>
+        <ButtonInvisibleHideSmall onClick={() => {
+            toggleAvailableChats();
+            setTimeout(() => {
+              let chatColumn = document.getElementById('availableChats');
+              window.scrollTo({ top: 0, left: chatColumn.getBoundingClientRect().left, behavior: 'smooth' });
+            }, 100);
+          }}>
           <FontAwesomeIcon icon='comments' className='fa-lg'/>
         </ButtonInvisibleHideSmall>
-        <ButtonInvisibleHideMedium>
+        <ButtonInvisibleHideMedium onClick={() => {
+            toggleContacts();
+            setTimeout(() => {
+              let contactsColumn = document.getElementById('contacts');
+              window.scrollTo({ top: 0, left: contactsColumn.getBoundingClientRect().left, behavior: 'smooth' });
+            }, 100);
+          }}>
           <FontAwesomeIcon icon='list-ul' className='fa-lg'/>
         </ButtonInvisibleHideMedium>
         <Dropdown>

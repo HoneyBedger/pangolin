@@ -60,20 +60,19 @@ class ChatBody extends Component {
   }
 
   componentDidUpdate(prevProps) {
-    //console.log('chat body updated:', prevProps.chat._id, this.props.chat._id, prevProps.chat.messages.length, this.props.chat.messages.length);
-    if (this.props.chat && prevProps.chat._id === this.props.chat._id &&
+    if (prevProps.chat && this.props.chat && prevProps.chat._id === this.props.chat._id &&
       prevProps.chat.messages.length < this.props.chat.messages.length) {
         this.props.resetUnseenMsgs(this.props.chat._id, this.props.user.token);
       }
   }
 
   render() {
-    let { chat, contacts, user, sendFirstMessage, sendMessage, showModal, resetUnseenMsgs } = this.props;
+    let { chat, contacts, user, sendFirstMessage, sendMessage,
+      showModal, resetUnseenMsgs } = this.props;
 
     if (!chat) return <p style={{padding: '20px 7px 20px 27px'}}>Select a person and start messaging!</p>;
 
 
-    console.log('in Chat Body chat, contacts', chat, contacts);
     const participants = chat.users.filter(id => id !== user._id)
     .map(id => {
       let contact = contacts.filter(contact => contact._id === id)[0];
@@ -83,10 +82,12 @@ class ChatBody extends Component {
     chat.messages.sort((m1, m2) => new Date(m1.updatedAt) - new Date(m2.updatedAt));
 
     //scroll messages to bottom
-    setTimeout(() => {
-      let messageHistory = document.getElementById("message_history");
-      messageHistory.scrollTop = messageHistory.scrollHeight;
-    }, 100);
+    let messageHistory = document.getElementById("message_history");
+    if (messageHistory) {
+      setTimeout(() => {
+        messageHistory.scrollTop = messageHistory.scrollHeight;
+      }, 100);
+    }
 
     return (
       <ChatBodyContainer>

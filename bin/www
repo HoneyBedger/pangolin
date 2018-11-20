@@ -7,7 +7,6 @@ const http = require('http');
 const socketIO = require('socket.io');
 const authentication = require('../authentication');
 const clientManager = require('../socket/clientManager');
-const chatManager = require('../socket/chatManager')();
 const makeHandlers = require('../socket/handlers');
 const handleConnect = require('../socket/handleConnect');
 
@@ -18,7 +17,6 @@ app.set('port', port);
 
 // Create HTTP server and WebSocket server.
 var server = http.createServer(app);
-
 const socket = socketIO(server);
 
 // Listen on provided port, on all network interfaces.
@@ -26,15 +24,14 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
+// Authentication middleware for Socket IO
 socket.use((socket, next) => authentication.verifyUser(socket, next));
+
 // Listen to WebSocket events
-socket.on('connection', function (socket) {
+socket.on('connection', (socket) => {
 
   handleConnect(socket, clientManager, (err, res) => {
-    if (err) {
-      console.log('socket connection error', err);
-      socket.disconnect(true);
-    }
+    if (err) socket.disconnect(true);
     else {
       const _id = res._id;
       const username = res.username;
@@ -49,7 +46,7 @@ socket.on('connection', function (socket) {
         handleResetUnseenMsgs,
         handleLogout,
         handleDisconnect
-      } = makeHandlers(_id, username, socket, clientManager, chatManager);
+      } = makeHandlers(_id, username, socket, clientManager);
 
       socket.on('ADD_CONTACT', handleAddContact);
       socket.on('UPLOAD_PICTURE', handleUploadPicture);
@@ -62,16 +59,14 @@ socket.on('connection', function (socket) {
 
       socket.on('LOGOUT', handleLogout);
 
-      socket.on('disconnect', function () {
+      socket.on('disconnect', () => {
         console.log('client disconnect...', socket.id);
         handleDisconnect();
       });
 
-      socket.on('error', function (err) {
-        console.log('received error from client:', socket.id);
-        console.log(err);
+      socket.on('error', (err) => {
+        console.log('error with client:', socket.id, 'Error:', err);
       });
-
     }
   });
 

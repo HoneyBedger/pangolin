@@ -23,15 +23,8 @@ const mapDispatchToProps = (dispatch) => ({
   hideModal: () => dispatch(hideModal())
 });
 
-const AddPersonModal = ({
-  contacts,
-  chat,
-  token,
-  searchContactsInModal,
-  addPersonToChat,
-  addPersonToChatLocally,
-  hideModal
-}) => {
+const AddPersonModal = ({ contacts, chat, token, searchContactsInModal,
+  addPersonToChat, addPersonToChatLocally, hideModal }) => {
 
   let searchInput;
   const search = () => {

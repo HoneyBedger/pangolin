@@ -18,7 +18,9 @@ const actionTypes = {
   ADD_PERSON_TO_CHAT_SUCCESS: 'ADD_PERSON_TO_CHAT_SUCCESS',
   ADD_PERSON_TO_CHAT_FAILED: 'ADD_PERSON_TO_CHAT_FAILED',
 
-  SOCKET_ERROR: 'error'
+  JWT_EXPIRED: 'JWT_EXPIRED',
+  SOCKET_ERROR: 'connect_error',
+  ERROR: 'error'
 };
 
 export default actionTypes;

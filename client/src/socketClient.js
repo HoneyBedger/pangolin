@@ -4,6 +4,7 @@ import { userLoading } from './actions/actionCreators';
 
 let socket;
 
+// Connect to the WebSocket server, dispatch socket events as Redux actions
 export const connectToSocket = (store) => {
   store.dispatch(userLoading());
 
@@ -11,7 +12,6 @@ export const connectToSocket = (store) => {
     || window.localStorage.getItem('userToken');
   let username = ( store.user && store.user.user && store.user.user.username )
     || window.localStorage.getItem('username');
-  console.log('connecting to WebSocket with token = ', token);
   socket = socketIO('/', {
     autoConnect: false,
     transportOptions: {
@@ -25,20 +25,12 @@ export const connectToSocket = (store) => {
   });
 
   Object.values(socketActionTypes).forEach(type => socket.on(type, (payload) => {
-    console.log("webSocket received ", type, ' with payload', payload);
     store.dispatch({
       type,
       payload
     });
   }));
 
-  const logout = (username, cb) => {
-    socket.emit('logout', username, cb);
-  };
-
-  const message = (fromUsername, toUsernames, content, cb) => {
-    socket.emit('message', fromUsername, toUsernames, content, cb);
-  };
 
   socket.open();
 };

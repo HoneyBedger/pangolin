@@ -1,12 +1,15 @@
+//===DEPENDENCIES===//
 const sharp = require('sharp');
 const authentication = require('../authentication');
 const User = require('../models/users');
 const Chat = require('../models/chats');
+//==================//
 
-module.exports = function (_id, username, client, clientManager, chatManager) {
 
+module.exports = function (_id, username, client, clientManager) {
+
+  // Local helper to add idsToAdd to the contacts of userId
   const addContactOneSide = (userId, idsToAdd, callback) => {
-    console.log('adding ids', idsToAdd, ' to contacts of', userId);
     let userSocket = clientManager.getClient(String(userId));
     User.findByIdAndUpdate(userId,
       { $push: { contacts: idsToAdd, newContacts: userSocket ? [] : idsToAdd } },
@@ -26,11 +29,41 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
     }).catch(err => callback(err));
   };
 
+  // Local helper which makes sure users in a new chat are in each other's contacts
+  // and notifies all the users of this new chat
+  const notifyOfNewChat = (chat, users, oldId) => {
+    users.forEach(id => {
+      let userSocket = clientManager.getClient(String(id));
+      // check if this user has all the other ones in the chat as contacts
+      // if not, add contact
+      User.findById(id)
+      .then(thisUser => {
+        let idsToAdd = [];
+        for (let otherId of users) {
+          if (otherId !== id && thisUser.contacts.indexOf(otherId) === -1)
+            idsToAdd.push(otherId);
+        }
+        addContactOneSide(thisUser._id, idsToAdd, (err) => {
+          if (err) throw new Error(err.message);
+          else if (userSocket) // if the user is online
+            userSocket.emit('FIRST_MESSAGE_SUCCESS', {
+              chat: { ...chat._doc,
+                numUnseenMsgs: chat.numUnseenMsgs.filter(obj => String(obj.userId) == String(thisUser._id))[0].numUnseen},
+                oldId });
+        })
+      })
+      .catch(err => {throw new Error(err.message)});
+    });
+  };
+
 
 
   const handleAddContact = ({ usernameToAdd, token }) => {
-    console.log('Adding contact:', usernameToAdd);
-    if (!authentication.tokenOK(token)) return;
+    if (!authentication.tokenOK(token)) {
+      client.emit('JWT_EXPIRED');
+      client.disconnect(true);
+      return;
+    }
     // add contact to user's own list and add user to the contact's list
     User.findOne({ username })
     .then(user => {
@@ -54,13 +87,18 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
             userToAddSocket.emit('NEW_CONTACT', contact);
           }
         });
-        console.log('done adding contact');
       });
     }).catch(err => console.log('In ADD_CONTACT Error: ', err.message));
   };
 
+
+
   const handleUploadPicture = ({ picture, type, token }) => {
-    if (!authentication.tokenOK(token)) return;
+    if (!authentication.tokenOK(token)) {
+      client.emit('JWT_EXPIRED');
+      client.disconnect(true);
+      return;
+    }
     User.findOne({ username })
     .then(user => {
         let pictureBuffer = new Buffer(picture);
@@ -68,10 +106,7 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
         .resize({ width: 100, height: 100, fit: 'contain'})
         .toBuffer()
         .then(resizedPicture => {
-          user.picture = {
-            data: resizedPicture.toString('base64'),
-            type
-          };
+          user.picture = { data: resizedPicture.toString('base64'), type };
           user.save()
           .then(updatedUser => {
             client.emit('UPLOAD_PICTURE_SUCCESS', updatedUser.picture);
@@ -84,15 +119,17 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
             });
           }).catch(err => {throw new Error(err.message)});
         }).catch(err => {throw new Error(err.message)});
-    }).catch(err => {
-      console.log('In UPLOAD_PICTURE Error: ', err.message);
-      client.emit('UPLOAD_PICTURE_FAILED', err.message);
-    });
+    }).catch(err => client.emit('UPLOAD_PICTURE_FAILED', err.message));
   };
 
+
+
   const handleChangeName = ({ name, token }) => {
-    console.log('changing name');
-    if (!authentication.tokenOK(token)) return;
+    if (!authentication.tokenOK(token)) {
+      client.emit('JWT_EXPIRED');
+      client.disconnect(true);
+      return;
+    }
     User.findOneAndUpdate({ username }, { $set: { name } }, {new: true})
     .then(user => {
       client.emit('CHANGE_NAME_SUCCESS', user.name);
@@ -102,40 +139,17 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
         if (contactSocket)
           client.to(`${contactSocket.id}`).emit('CONTACT_UPDATE', { username, name: user.name });
       });
-    }).catch(err => {
-      console.log('In CHANGE_NAME Error: ', err.message);
-      client.emit('CHANGE_NAME_FAILED', err.message);
-    });
+    }).catch(err => client.emit('CHANGE_NAME_FAILED', err.message));
   };
 
-  const handleFirstMessage = ({ chatId, users, content, token }) => {
-    console.log('received first message');
-    const notifyOfNewChat = (chat) => {
-      users.forEach(id => {
-        let userSocket = clientManager.getClient(String(id));
-        // check if this user has all the other ones in the chat as contacts
-        // if not, add contact
-        User.findById(id)
-        .then(thisUser => {
-          let idsToAdd = [];
-          for (let otherId of users) {
-            console.log('this user contacts', thisUser.contacts);
-            if (otherId !== id && thisUser.contacts.indexOf(otherId) === -1)
-              idsToAdd.push(otherId);
-          }
-          addContactOneSide(thisUser._id, idsToAdd, (err) => {
-            if (err) throw new Error(err.message);
-            else if (userSocket) // if the user is online
-              userSocket.emit('FIRST_MESSAGE_SUCCESS', {
-                chat: { ...chat, numUnseenMsgs: chat.numUnseenMsgs.filter(obj => String(obj.userId) == String(res._id))[0].numUnseen},
-                oldId: chatId });
-          })
-        })
-        .catch(err => {throw new Error(err.message)});
-      });
-    };
 
-    if (!authentication.tokenOK(token)) return;
+
+  const handleFirstMessage = ({ chatId, users, content, token }) => {
+    if (!authentication.tokenOK(token)) {
+      client.emit('JWT_EXPIRED');
+      client.disconnect(true);
+      return;
+    }
     Chat.findOne({ users })
     .then(res => {
       if (!res) { // such a chat doesn't exist yet
@@ -145,7 +159,7 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
           numUnseenMsgs: users.map(id => ({ userId: id, numUnseen: id == _id ? 0 : 1 }))
         });
         newChat.save()
-        .then(chat => notifyOfNewChat(chat))
+        .then(chat => notifyOfNewChat(chat, users, chatId))
         .catch(err => {throw new Error(err.message)});
       } else { // a chat already exists (if two users tried to create a chat approx at the same time)
         res.messages.push({ from: _id, content });
@@ -163,7 +177,11 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
 
 
   const handleMessage = ({ chatId, content, token }) => {
-    if (!authentication.tokenOK(token)) return;
+    if (!authentication.tokenOK(token)) {
+      client.emit('JWT_EXPIRED');
+      client.disconnect(true);
+      return;
+    }
     Chat.findById(chatId)
     .then(chat => {
       if (!chat) throw new Error('Chat not found.');
@@ -183,13 +201,17 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
         .catch(err => {throw new Error(err.message)});
       }
     })
-    .catch(err => socket.emit('MESSAGE_FAILED', err.message));
+    .catch(err => client.emit('MESSAGE_FAILED', err.message));
   };
 
 
 
   const handleAddPersonToChat = ({ chatId, userId, token }) => {
-    if (!authentication.tokenOK(token)) return;
+    if (!authentication.tokenOK(token)) {
+      client.emit('JWT_EXPIRED');
+      client.disconnect(true);
+      return;
+    }
     Chat.findById(chatId)
     .then(chat => {
       if (!chat) throw new Error('Chat not found.');
@@ -203,17 +225,17 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
             User.findById(id)
             .then(user => {
               let userSocket = clientManager.getClient(String(user._id));
-              if (user._id != userId && user.contacts.indexOf(userId) === -1) {
+              if (String(user._id) != userId && user.contacts.indexOf(userId) === -1) {
                 addContactOneSide(user._id, [userId], (err) => {
                   if (!err && userSocket)
                     userSocket.emit('ADD_PERSON_TO_CHAT_SUCCESS', { chatId, userId });
                 });
-              } else if (user._id == userId) {
+              } else if (String(user._id) == userId) {
                 addContactOneSide(user._id,
-                  chat.users.filter(oldId => (oldId != user._id && user.contacts.indexOf(oldId) === -1)),
+                  chat.users.filter(oldUserId => (String(oldUserId) !== String(user._id) && user.contacts.indexOf(oldUserId) === -1)),
                   (err) => {
                   if (!err && userSocket)
-                    userSocket.emit('FIRST_MESSAGE_SUCCESS', { chat: updatedChat, oldId: null });
+                    userSocket.emit('FIRST_MESSAGE_SUCCESS', { chat: updatedChat._doc, oldId: null });
                 });
               } else if (userSocket)
                 userSocket.emit('ADD_PERSON_TO_CHAT_SUCCESS', { chatId, userId });
@@ -221,11 +243,17 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
           });
         }).catch(err => {throw new Error(err.message)});
       }
-    }).catch(err => socket.emit('ADD_PERSON_TO_CHAT_FAILED', err.message));
+    }).catch(err => client.emit('ADD_PERSON_TO_CHAT_FAILED', err.message));
   };
 
+
+
   const handleResetUnseenMsgs = ({ chatId, token }) => {
-    if (!authentication.tokenOK(token)) return;
+    if (!authentication.tokenOK(token)) {
+      client.emit('JWT_EXPIRED');
+      client.disconnect(true);
+      return;
+    }
     Chat.findById(chatId)
     .then(chat => {
       for (let obj of chat.numUnseenMsgs) {
@@ -238,26 +266,27 @@ module.exports = function (_id, username, client, clientManager, chatManager) {
     }).catch(err => console.log('In RESET_UNSEEN_MESSAGES Error: ', err.message));
   };
 
+
+
   const handleLogout = () => {
-    console.log(username, " logged out");
     clientManager.removeClient(String(_id));
     client.disconnect(true);
   }
 
   function handleDisconnect() {
-    console.log(username, ' disconnected');
     clientManager.removeClient(String(_id));
     User.findOne({ username })
     .then(user => {
       //console.log('notifying contacts of', user);
       user.contacts.forEach(contact => {
-        console.log('notifying', contact.username);
         let contactSocket = clientManager.getClient(String(contact));
         if (contactSocket)
           contactSocket.emit('CONTACT_UPDATE', { username, online: false });
       })
     }).catch(err => console.log('In DISCONNECT Error: ', err.message));
   }
+
+
 
   return {
     handleAddContact,

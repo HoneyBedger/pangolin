@@ -1,7 +1,13 @@
+//===DEPENDENCIES==//
 const authentication = require('../authentication');
 const User = require('../models/users');
 const Chat = require('../models/chats');
+//=================//
 
+
+//===Check the token and username provided by the user,
+//  send the user object, contacts, and chats if everything OK,
+//  notify other users that this one is online ===//
 module.exports = function(client, clientManager, callback) {
   let username = client.handshake.headers['username'];
   User.findOne({ username })

@@ -74,8 +74,6 @@ const contacts = (state = initialState, action) => {
       };
       } else return { ...state, selectedContactId: action.payload };
     }
-    case actionTypes.LOGOUT_LOCALLY:
-      return initialState;
     default:
       return state;
   }

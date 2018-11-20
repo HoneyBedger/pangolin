@@ -8,11 +8,6 @@ import { InputGroup, SearchInput, ButtonPrimary } from '../Form/Elements';
 import { List, ListItem, MessageBadge } from './ListElements';
 import ErrorMessage from '../ErrorMessage';
 
-const ChatsColumn = styled(Column)`
-  border-right: solid 1px #1f253d;
-
-`;
-
 class AvailableChats extends Component {
 
   constructor(props) {
@@ -26,10 +21,19 @@ class AvailableChats extends Component {
   };
 
   render () {
-    let { chats, contacts, userId, token, searchExistingChats, selectChat, resetUnseenMsgs } = this.props;
+    let { chats, contacts, userId, token, searchExistingChats, selectChat,
+      resetUnseenMsgs, smallDeviceDisplay } = this.props;
+
+    const ChatsColumn = styled(Column)`
+      border-right: solid 1px #1f253d;
+      @media (max-width: 767px) {
+        display: ${smallDeviceDisplay.showAvailableChats ? 'grid' : 'none'};
+      }
+    `;
+
     //sort chats by most recent message timestamp
     chats.chats.sort((chat1, chat2) => {
-      console.log('chat1, chat2', chat1, chat2);
+      //console.log('chat1, chat2', chat1, chat2);
       let lastMsgTime1 = chat1.messages.length > 0 && new Date(chat1.messages[chat1.messages.length - 1].updatedAt);
       let lastMsgTime2 = chat2.messages.length > 0 && new Date(chat2.messages[chat2.messages.length - 1].updatedAt);
       if (lastMsgTime1 && lastMsgTime1) return lastMsgTime2 - lastMsgTime1;
@@ -42,7 +46,10 @@ class AvailableChats extends Component {
 
     let ChatList;
     if (!userId || !contacts || !chats.chats)
-      ChatList = <ErrorMessage style={{padding: '20px 7px 20px 14px', textAlign: 'left'}}>Sorry, something is wrong with your chats.</ErrorMessage>
+      ChatList = (
+        <ErrorMessage style={{padding: '20px 7px 20px 14px', textAlign: 'left'}}>
+          Sorry, something is wrong with your chats.</ErrorMessage>
+      );
     else if (chats.chats.length === 0)
       ChatList = <p style={{padding: '20px 7px 20px 14px', textAlign: 'left'}}>No chats.</p>
     else
@@ -57,7 +64,7 @@ class AvailableChats extends Component {
                       selectChat(chat._id);
                       resetUnseenMsgs(chat._id, token);
                     }} >
-                    <div>
+                    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'flex-start'}}>
                       {chat.users.map(id => {
                         if (id === userId) return null;
                         let contact = contacts.filter(contact => contact._id === id)[0];
@@ -79,7 +86,7 @@ class AvailableChats extends Component {
           );
 
     return (
-      <ChatsColumn>
+      <ChatsColumn id="availableChats">
         <HeaderContainer style={{background: 'rgba(57, 66, 100, 0.5)'}}>
           <InputGroup>
             <SearchInput placeholder='Search Chats'

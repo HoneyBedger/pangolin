@@ -26,7 +26,6 @@ exports.verifyUser = (socket, next) => {
     next(err);
     return;
   }
-  console.log('in JWT verification payload is:', tokenPayload);
   if (tokenPayload.username !== username)
       next(new Error('Authentication token does not belong to user.'));
   else next(); // token appears to be valid
@@ -35,16 +34,14 @@ exports.verifyUser = (socket, next) => {
 exports.tokenOK = (token) => {
   try {
     tokenPayload = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('token auth OK');
     return true;
   } catch (err) {
-    console.log('token auth failed');
     return false;
   }
 };
 
 exports.getToken = (user) => {
-  return jwt.sign(user, process.env.JWT_SECRET, {expiresIn: 60*60*5});
+  return jwt.sign(user, process.env.JWT_SECRET, {expiresIn: 60*60*10});
 };
 
 

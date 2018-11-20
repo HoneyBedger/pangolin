@@ -27,23 +27,12 @@ const mapDispatchToProps = (dispatch) => ({
   hideModal: () => dispatch(hideModal())
 });
 
-const AddContactModal = ({
-  existingContacts,
-  myUsername,
-  token,
-  contacts,
-  errMessage,
-  isLoading,
-  searchContacts,
-  addContact,
-  clearContactSearch,
-  hideModal
-}) => {
+const AddContactModal = ({ existingContacts, myUsername, token, contacts, errMessage,
+  isLoading, searchContacts, addContact, clearContactSearch, hideModal }) => {
 
   let searchInput;
 
   const search = () => {
-    console.log('searching for a contact', searchInput);
     if (searchInput.value && searchInput.value.length > 2)
       searchContacts(searchInput.value, token);
   };

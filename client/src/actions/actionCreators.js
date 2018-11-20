@@ -2,6 +2,7 @@ import actionTypes from './actionTypes';
 import socketActionTypes from './socketActionTypes';
 import { connectToSocket } from '../socketClient';
 
+
 //===MODAL===//
 export const showModal = (modalType, modalProps) => {
   return {
@@ -15,6 +16,21 @@ export const hideModal = () => {
     type: actionTypes.HIDE_MODAL
   };
 };
+
+
+//===SMALL DEVICE DISPLAY===//
+export const toggleAvailableChats = () => {
+  return {
+    type: actionTypes.TOGGLE_AVAILABLE_CHATS
+  };
+};
+
+export const toggleContacts = () => {
+  return {
+    type: actionTypes.TOGGLE_CONTACTS
+  };
+};
+
 
 //===CONTACTS===//
 export const searchExistingContacts = (searchString) => {
@@ -32,7 +48,6 @@ export const searchContactsInModal = (searchString) => {
 };
 
 export const searchContacts = (searchString, token) => (dispatch) => {
-  console.log('searching contacts with token', token);
   dispatch(contactsLoading());
   return fetch(`/users?search=${searchString}`, {
     headers: { 'Authorization': 'Bearer ' + String(token)}
@@ -57,7 +72,6 @@ export const contactsLoading = () => {
 };
 
 export const contactsLoadingSuccess = (contacts) => {
-  console.log("contacts loaded:", contacts);
   return {
     type: actionTypes.CONTACTS_LOADING_SUCCESS,
     payload: contacts
@@ -65,7 +79,6 @@ export const contactsLoadingSuccess = (contacts) => {
 };
 
 export const contactsLoadingFailed = (errMessage) => {
-  console.log("contacts loading failed:", errMessage);
   return {
     type: actionTypes.CONTACTS_LOADING_FAILED,
     payload: errMessage
@@ -95,7 +108,6 @@ export const selectContact = (id) =>  {
 
 //===CHAT===//
 export const sendFirstMessage = (chatId, users, content, token) => (dispatch, getState, emit) => {
-  console.log('sending first message');
   emit('FIRST_MESSAGE', { chatId, users, content, token });
 };
 
@@ -143,7 +155,6 @@ export const resetUnseenMsgsLocally = (id) => {
 
 //===USER===//
 export const fetchUser = (username, password) => (dispatch) => {
-  console.log("fetching user");
   dispatch(userLoading());
   return fetch('/users/login', {
     method: 'POST',
@@ -153,7 +164,6 @@ export const fetchUser = (username, password) => (dispatch) => {
     res.json()
     .then(resObj => {
       if (resObj.err) {
-        console.log(resObj.err);
         dispatch(userLoadingFailed(resObj.err));
         return;
       }
@@ -169,7 +179,6 @@ export const fetchUser = (username, password) => (dispatch) => {
 };
 
 export const registerUser = (username, password, name) => (dispatch) => {
-  console.log("registering user");
   dispatch(userRegistering());
   return fetch('/users/register', {
     method: 'POST',
@@ -179,7 +188,6 @@ export const registerUser = (username, password, name) => (dispatch) => {
     res.json()
     .then(resObj => {
       if (resObj.err) {
-        console.log(resObj.err);
         dispatch(userRegisteringFailed(resObj.err));
         return;
       }
@@ -197,7 +205,6 @@ export const userLoading = () => {
 };
 
 export const userLoadingSuccess = (user) => {
-  console.log("user loaded:", user);
   return {
     type: actionTypes.USER_LOADING_SUCCESS,
     payload: user
@@ -205,7 +212,6 @@ export const userLoadingSuccess = (user) => {
 };
 
 export const userLoadingFailed = (errMessage) => {
-  console.log("user loading failed:", errMessage);
   return {
     type: actionTypes.USER_LOADING_FAILED,
     payload: errMessage
@@ -219,7 +225,6 @@ export const userRegistering = () => {
 };
 
 export const userRegisteringSuccess = (user) => {
-  console.log("user loaded:", user);
   return {
     type: actionTypes.USER_REGISTERING_SUCCESS,
     payload: user
@@ -227,7 +232,6 @@ export const userRegisteringSuccess = (user) => {
 };
 
 export const userRegisteringFailed = (errMessage) => {
-  console.log("user loading failed:", errMessage);
   return {
     type: actionTypes.USER_REGISTERING_FAILED,
     payload: errMessage
@@ -235,7 +239,6 @@ export const userRegisteringFailed = (errMessage) => {
 };
 
 export const logout = () => (dispatch, getState, emit) => {
-  console.log('logging out');
   emit('LOGOUT');
   window.localStorage.removeItem('username');
   window.localStorage.removeItem('userToken');
@@ -250,7 +253,6 @@ export const logoutLocally = () => {
 
 //===PROFILE UPDATES===//
 export const uploadPicture = (picture, type, token) => (dispatch, getState, emit) => {
-  console.log('uploading picture');
   dispatch(uploadPictureInprogress());
   const fr = new FileReader();
   fr.onload = () => {

@@ -9,16 +9,14 @@ import ChatHeader from './Header';
 import ChatBody from './ChatBody';
 import AvailableChats from './AvailableChats';
 import Contacts from './Contacts';
-//import { fakeUser } from '../../fakeData/user';
-//import { contacts } from '../../fakeData/contacts';
-//import { chats } from '../../fakeData/chats';
 
 const mapStateToProps = (state) => {
   return {
     user: state.user.user,
     contacts: state.contacts,
     chats: state.chats,
-    searchContacts: state.searchContacts
+    searchContacts: state.searchContacts,
+    smallDeviceDisplay: state.smallDeviceDisplay
   };
 };
 
@@ -29,56 +27,49 @@ const mapDispatchToProps = (dispatch) => {
 const ChatGrid = styled.section`
   height: 80vh;
   min-height: 300px;
-  min-width: 370px;
+  min-width: 350px;
   width: 96%;
   margin: auto;
   margin-top: 20px;
   margin-bottom: 50px;
   display: grid;
-  grid-template-columns: minmax(335px, 54%) minmax(220px, 23%) minmax(220px, 23%);
+  grid-template-columns: minmax(350px, 54%) minmax(220px, 23%) minmax(220px, 23%);
 
 `;
 
-class Chat extends Component {
+const Chat = ({ user, contacts, chats, searchContacts, smallDeviceDisplay,
+  logout, showModal, sendFirstMessage, sendMessage, resetUnseenMsgs,
+  searchExistingChats, selectChat, searchExistingContacts, selectContact,
+  toggleContacts, toggleAvailableChats }) => {
 
-  render() {
-    console.log('in chat showModal', this.props.showModal);
-    let allChats = this.props.chats.beforeSearch ?
-      this.props.chats.beforeSearch : this.props.chats.chats;
+  let allChats = chats.beforeSearch ? chats.beforeSearch : chats.chats;
 
-    return (
-      <div id='chat'>
-        <Logo />
-        <ChatGrid>
-          <Column>
-            <ChatHeader name={this.props.user.name} picture={this.props.user.picture}
-              logout={this.props.logout} showModal={this.props.showModal}/>
-            <ChatBody chat={ this.props.chats.selectedChatId
-                ? allChats.filter(chat => chat._id === this.props.chats.selectedChatId)[0]
-                : allChats[0] }
-              contacts={this.props.contacts.beforeSearch ? this.props.contacts.beforeSearch : this.props.contacts.contacts}
-              user={this.props.user}
-              sendFirstMessage={this.props.sendFirstMessage}
-              sendMessage={this.props.sendMessage}
-              showModal={this.props.showModal}
-              resetUnseenMsgs={this.props.resetUnseenMsgs} />
-          </Column>
-          <AvailableChats chats={this.props.chats}
-            contacts={this.props.contacts.beforeSearch ? this.props.contacts.beforeSearch : this.props.contacts.contacts}
-            userId={this.props.user && this.props.user._id}
-            token={this.props.user && this.props.user.token}
-            searchExistingChats={this.props.searchExistingChats}
-            selectChat={this.props.selectChat}
-            resetUnseenMsgs={this.props.resetUnseenMsgs} />
-          <Contacts contacts={this.props.contacts}
-            showModal={this.props.showModal}
-            searchContacts={this.props.searchContacts}
-            searchExistingContacts={this.props.searchExistingContacts}
-            selectContact={this.props.selectContact} />
-        </ChatGrid>
-      </div>
-    );
-  }
+  return (
+    <div id='chat'>
+      <Logo />
+      <ChatGrid>
+        <Column>
+          <ChatHeader name={user.name} picture={user.picture} logout={logout}
+            showModal={showModal} toggleAvailableChats={toggleAvailableChats}
+            toggleContacts={toggleContacts} />
+          <ChatBody chat={ chats.selectedChatId
+              ? allChats.filter(chat => chat._id === chats.selectedChatId)[0]
+              : allChats[0] }
+            contacts={contacts.beforeSearch ? contacts.beforeSearch : contacts.contacts}
+            user={user} sendFirstMessage={sendFirstMessage} sendMessage={sendMessage}
+            showModal={showModal} resetUnseenMsgs={resetUnseenMsgs} />
+        </Column>
+        <AvailableChats chats={chats}
+          contacts={contacts.beforeSearch ? contacts.beforeSearch : contacts.contacts}
+          userId={user && user._id} token={user && user.token}
+          searchExistingChats={searchExistingChats} selectChat={selectChat}
+          resetUnseenMsgs={resetUnseenMsgs} smallDeviceDisplay={smallDeviceDisplay} />
+        <Contacts contacts={contacts} showModal={showModal}
+          searchContacts={searchContacts} searchExistingContacts={searchExistingContacts}
+          selectContact={selectContact} smallDeviceDisplay={smallDeviceDisplay} />
+      </ChatGrid>
+    </div>
+  );
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Chat);

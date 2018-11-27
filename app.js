@@ -34,7 +34,7 @@ app.use(passport.initialize());
 
 //Secure traffic only
 app.all('*', (req, res, next) => {
-  if (req.headers['x-forwarded-proto'] != 'https')
+  if (req.headers['x-forwarded-proto'] == 'https')
     res.redirect(302, 'https://' + req.hostname + req.originalUrl);
   else {
     next();

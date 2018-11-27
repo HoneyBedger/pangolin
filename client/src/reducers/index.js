@@ -7,7 +7,7 @@ import modal from './modal';
 import searchContacts from './searchContacts';
 import smallDeviceDisplay from './smallDeviceDisplay';
 
-const allReducers = combineReducers({
+const rootReducer = combineReducers({
   user,
   contacts,
   chats,
@@ -16,12 +16,5 @@ const allReducers = combineReducers({
   form: formReducer,
   smallDeviceDisplay
 });
-
-const rootReducer = (state, action) => {
-  if (action.type === 'LOGOUT_LOCALLY') 
-    state = undefined;
-
-  return allReducers(state, action);
-}
 
 export default rootReducer;

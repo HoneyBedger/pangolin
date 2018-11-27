@@ -21,8 +21,14 @@ const mapDispatchToProps = (dispatch) => ({
   hideModal: () => dispatch(hideModal())
 });
 
-const UploadPictureModal = ({ token, error, name, isLoading, changeName,
-  hideModal }) => {
+const UploadPictureModal = ({
+  token,
+  error,
+  name,
+  isLoading,
+  changeName,
+  hideModal
+}) => {
 
   let nameInput;
 

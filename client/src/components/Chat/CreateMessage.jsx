@@ -1,14 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import { ButtonPrimary } from '../Form/Elements';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { ButtonPrimary, ButtonInvisible } from '../Form/Elements';
 
 const MessageInput = styled.textarea`
   box-sizing: border-box;
   height: 70px;
   width: 80%;
-  @media (max-width: 991px) {
-    width: 70%;
-  }
   @media (max-width: 767px) {
     width: 60%;
   }
@@ -25,6 +23,7 @@ const MessageInput = styled.textarea`
   }
 `;
 
+//TODO: make sure the message is sent on hitting Enter
 
 const CreateMessage = ({ send }) => {
   let messageInput;
@@ -44,6 +43,14 @@ const CreateMessage = ({ send }) => {
         ref={(input) => messageInput = input}
         onKeyPress={(e) => handleKeyPress(e)} />
       <div style={{float: 'left', marginLeft: '20px'}}>
+        <div style={{marginBottom: '18px'}}>
+        <ButtonInvisible>
+          <FontAwesomeIcon icon='smile' className='fa-lg'/>
+        </ButtonInvisible>
+        <ButtonInvisible>
+          <FontAwesomeIcon icon='microphone' className='fa-lg'/>
+        </ButtonInvisible>
+        </div>
         <ButtonPrimary onClick={() => {
             if (messageInput.value && messageInput.value.trim() !== '')
               send(messageInput.value);

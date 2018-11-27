@@ -1,6 +1,5 @@
 import actionTypes from './actionTypes';
 
-
 //===MODAL===//
 export const showModal = (modalType, modalProps) => {
   return {
@@ -15,20 +14,17 @@ export const hideModal = () => {
   };
 };
 
-
 //===SMALL DEVICE DISPLAY===//
 export const toggleAvailableChats = () => {
   return {
     type: actionTypes.TOGGLE_AVAILABLE_CHATS
   };
 };
-
-export const toggleContacts = () => {
+ export const toggleContacts = () => {
   return {
     type: actionTypes.TOGGLE_CONTACTS
   };
 };
-
 
 //===CONTACTS===//
 export const searchExistingContacts = (searchString) => {

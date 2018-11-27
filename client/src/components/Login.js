@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Redirect } from 'react-router-dom';
 import styled from 'styled-components';
@@ -36,32 +37,38 @@ const LoginGrid = styled.section`
   }
 `;
 
-const Login = ({ user, fetchUser, registerUser}) => {
+class Login extends Component {
 
-  if (user.user && user.user.token) {
-    return <Redirect to='/' />;
-  } else  {
-    return (
-      <React.Fragment>
-        {user.isLoading && <Loading />}
-        <Logo/>
-        <ErrorMessage>{user.socketErrMessage}</ErrorMessage>
-        <LoginGrid>
-          <div>
-            <FormHeader>Sign In</FormHeader>
-            <SignIn onSubmit={(values) => {
-                fetchUser(values.signinEmail.trim(), values.signinPassword.trim());
-              }} errMessage={user.loginErrMessage}/>
-          </div>
-          <div>
-            <FormHeader>Sign Up</FormHeader>
-            <SignUp onSubmit={(values) => {
-                registerUser(values.email.trim(), values.password.trim(), values.name.trim());
-              }} errMessage={user.registerErrMessage} />
-          </div>
-        </LoginGrid>
-      </React.Fragment>
-    );
+  render() {
+    let user = this.props.user;
+    if (user.user && user.user.token) {
+      return <Redirect to='/' />;
+    } else  {
+      return (
+        <React.Fragment>
+          {user.isLoading && <Loading />}
+          <Logo/>
+          <ErrorMessage>{user.socketErrMessage}</ErrorMessage>
+          <LoginGrid>
+            <div>
+              <FormHeader>Sign In</FormHeader>
+              <SignIn onSubmit={(values) => {
+                  console.log('in login:', values);
+                  this.props.fetchUser(values.signinEmail.trim(), values.signinPassword.trim());
+                }}
+                errMessage={user.loginErrMessage}/>
+            </div>
+            <div>
+              <FormHeader>Sign Up</FormHeader>
+              <SignUp onSubmit={(values) => {
+                  console.log('registering user', values);
+                  this.props.registerUser(values.email.trim(), values.password.trim(), values.name.trim());
+                }} errMessage={user.registerErrMessage} />
+            </div>
+          </LoginGrid>
+        </React.Fragment>
+      );
+    }
   }
 }
 

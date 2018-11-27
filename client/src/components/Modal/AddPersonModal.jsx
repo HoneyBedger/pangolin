@@ -3,8 +3,10 @@ import { connect } from 'react-redux';
 import { searchContactsInModal, addPersonToChat, addPersonToChatLocally, hideModal } from '../../actions/actionCreators';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Modal, ModalHeader, ModalBody } from './Elements';
-import { InputGroup, SearchInput, ButtonPrimary, ButtonOutline } from '../Form/Elements';
+import { InputGroup, SearchInput, ButtonPrimary, ButtonInvisible, ButtonOutline } from '../Form/Elements';
 import { List, ListItem } from '../Chat/ListElements';
+import ErrorMessage from '../ErrorMessage';
+import LoadingSmall from '../LoadingSmall';
 import ProfilePicture from '../Chat/ProfilePicture';
 
 
@@ -21,8 +23,15 @@ const mapDispatchToProps = (dispatch) => ({
   hideModal: () => dispatch(hideModal())
 });
 
-const AddPersonModal = ({ contacts, chat, token, searchContactsInModal,
-  addPersonToChat, addPersonToChatLocally, hideModal }) => {
+const AddPersonModal = ({
+  contacts,
+  chat,
+  token,
+  searchContactsInModal,
+  addPersonToChat,
+  addPersonToChatLocally,
+  hideModal
+}) => {
 
   let searchInput;
   const search = () => {

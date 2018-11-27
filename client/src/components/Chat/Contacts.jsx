@@ -8,17 +8,13 @@ import { InputGroup, SearchInput, ButtonPrimary,
   ButtonInvisible } from '../Form/Elements';
 import { List, ListItem, Badge } from './ListElements';
 
+const ContactsColumn = styled(Column)`
+
+`;
 
 const Contacts = ({ contacts, showModal, searchContacts,
-  searchExistingContacts, selectContact, smallDeviceDisplay }) => {
+  searchExistingContacts, selectContact }) => {
 
-  const ContactsColumn = styled(Column)`
-    @media (max-width: 991px) {
-      display: ${smallDeviceDisplay.showContacts ? 'grid' : 'none'};
-    }
-  `;
-
-  // sort alphabetically
   contacts.contacts.sort((c1, c2) => {
     if (c1.name === c2.name) return 0;
     return c1.name > c2.name ? 1 : -1;
@@ -31,7 +27,7 @@ const Contacts = ({ contacts, showModal, searchContacts,
   };
 
   return (
-    <ContactsColumn id="contacts">
+    <ContactsColumn>
       <HeaderContainer>
         <InputGroup>
           <SearchInput placeholder='Search Contacts'

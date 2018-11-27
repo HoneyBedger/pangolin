@@ -26,19 +26,28 @@ const mapDispatchToProps = (dispatch) => ({
   hideModal: () => dispatch(hideModal())
 });
 
-
-const UploadPictureModal = ({ token, warning, error, picture, name, isLoading,
-  uploadPicture, uploadPictureWarning, hideModal }) => {
+const UploadPictureModal = ({
+  token,
+  warning,
+  error,
+  picture,
+  name,
+  isLoading,
+  uploadPicture,
+  uploadPictureWarning,
+  hideModal
+}) => {
 
 
   let fileInput;
 
   const checkIfValid = () => {
+    console.log('selected file:', fileInput.files[0]);
     if (!fileInput || !fileInput.files[0]) {
       uploadPictureWarning('Please select a file.');
       return false;
     }
-    let extension = fileInput.value.match(/\.([^.]+)$/)[1];
+    let extension = fileInput.value.match(/\.([^\.]+)$/)[1];
     let allowedExtensions = ['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'];
     if (!allowedExtensions.includes(extension)) {
       uploadPictureWarning('Please select a jpg or png file.');
@@ -51,7 +60,6 @@ const UploadPictureModal = ({ token, warning, error, picture, name, isLoading,
     uploadPictureWarning(fileInput.files[0].name);
     return true;
   };
-
 
   return (
     <Modal close={hideModal}>

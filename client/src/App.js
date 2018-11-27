@@ -20,31 +20,6 @@ library.add(faCog, faSearch, faEnvelope, faUnlock, faUser, faUserCircle,
 
 class App extends Component {
 
-  /*constructor(props) {
-    super(props);
-    this.state = {
-      client: socket()
-    };
-    this.register = this.register.bind(this);
-  }
-
-  register(username, password, name) {
-    this.state.client.register(username, password, name, (err, user) => {
-      if (err) {
-        console.log("error registering", err);
-        return;
-      }
-      console.log("registered", user);
-      this.state.client.login(username, password, (err, user) => {
-        if (err) {
-          console.log("error logging in", err);
-          return;
-        }
-        console.log("authenticated", user);
-      });
-    });
-  }*/
-
   render() {
     return (
       <Provider store={store}>

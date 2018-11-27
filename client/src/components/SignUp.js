@@ -13,10 +13,10 @@ const Prompt = styled.p`
 
 // Validators
 const required = value => value && value.trim().length > 0 ? undefined : 'Required';
-const minLength5 = value => !value || value.trime().length < 5 ? 'Must be at least 5 characters' : undefined;
+const minLength5 = value => !value || value.trim().length < 5 ? 'Must be at least 5 characters' : undefined;
 const maxLength20 = value => value && value.trim().length > 20 ? 'Must be at most 20 characters' : undefined;
 const email = value =>
-  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value) ?
+  value && !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(value.trim()) ?
   'Invalid email address' : undefined;
 const matchesPassword = (value, allValues) => value !== allValues.password ? 'Passwords must match' : undefined;
 

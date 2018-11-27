@@ -14,7 +14,7 @@ const modal = (state = initialState, action) => {
       return initialState;
     default:
       return state;
-  };
+  }
 };
 
 export default modal;

@@ -32,6 +32,14 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(passport.initialize());
 
+//Secure traffic only
+app.all('*', (req, res, next) => {
+  if (req.secure) return next();
+  else {
+    res.redirect(307, `https://${req.hostname}${req.url}`);
+  }
+});
+
 app.use(express.static(path.join(__dirname, "client", "build")));
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

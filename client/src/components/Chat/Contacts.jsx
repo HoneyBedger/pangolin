@@ -1,5 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Column from './Column';
 import HeaderContainer from './HeaderContainer';
@@ -8,13 +7,11 @@ import { InputGroup, SearchInput, ButtonPrimary,
   ButtonInvisible } from '../Form/Elements';
 import { List, ListItem, Badge } from './ListElements';
 
-const ContactsColumn = styled(Column)`
-
-`;
 
 const Contacts = ({ contacts, showModal, searchContacts,
   searchExistingContacts, selectContact }) => {
 
+  // sort alphabetically
   contacts.contacts.sort((c1, c2) => {
     if (c1.name === c2.name) return 0;
     return c1.name > c2.name ? 1 : -1;
@@ -27,7 +24,7 @@ const Contacts = ({ contacts, showModal, searchContacts,
   };
 
   return (
-    <ContactsColumn>
+    <Column id="contacts">
       <HeaderContainer>
         <InputGroup>
           <SearchInput placeholder='Search Contacts'
@@ -58,7 +55,7 @@ const Contacts = ({ contacts, showModal, searchContacts,
               </ListItem> ))}
           </List>
         }
-    </ContactsColumn>
+    </Column>
   );
 };
 

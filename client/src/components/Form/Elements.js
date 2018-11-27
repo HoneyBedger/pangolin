@@ -22,11 +22,12 @@ const SignGrid = styled.div`
 
 const InputGroup = styled.div`
   max-width: 100%;
+  margin-right: 20px;
+  flex: 2 2 auto;
   display: flex;
   flex-direction: row;
   align-items: flex-end;
   color: #9099b7;
-  flex: 2 2 auto;
   box-sizing: border-box;
 `;
 

@@ -35,14 +35,19 @@ const user = (state = initialState, action) => {
     case socketActionTypes.CONNECTION_TO_SOCKET_FAILED:
       return { ...state, isLoading: false, socketErrMessage: action.payload, user: {} };
     case socketActionTypes.SOCKET_ERROR:
-      console.log('SOCKET_ERROR payload', action.payload);
-      let errMessage = (action.payload.includes('Token') ||
-        action.payload.includes('token') ||
-        action.payload.includes('NotBefore'))
+      let errMessage = (action.payload.message.includes('Token') ||
+        action.payload.message.includes('token') ||
+        action.payload.message.includes('NotBefore'))
         ? 'There was a problem with your authentication token. Please log in again.'
         : 'Something went wrong on the server. Please log in and try agan.';
       return { ...state, isLoading: false, socketErrMessage: errMessage, user: {} };
-
+    case socketActionTypes.ERROR: {
+      let errMessage =  !action.payload.message && action.payload.includes('jwt expired')
+        ? 'Your session has expired. Please log in again.' : action.payload.message;
+      return { ...state, isLoading: false, socketErrMessage: errMessage, user: {} };
+    }
+    case socketActionTypes.JWT_EXPIRED:
+      return { ...state, socketErrMessage: 'Your session has expired. Please log in again.', user: {} };
     case actionTypes.UPLOAD_PICTURE_WARNING:
       return { ...state, pictureWarning: action.payload };
     case actionTypes.UPLOAD_PICTURE_INPROGRESS:
@@ -58,8 +63,6 @@ const user = (state = initialState, action) => {
     case socketActionTypes.CHANGE_NAME_FAILED:
       return { ...state, nameIsLoading: false, nameErrMessage: action.payload };
 
-    case actionTypes.LOGOUT_LOCALLY:
-      return initialState;
     default:
       return state;
   }

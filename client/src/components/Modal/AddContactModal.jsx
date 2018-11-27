@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { searchContacts, addContact, clearContactSearch, hideModal } from '../../actions/actionCreators';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Modal, ModalHeader, ModalBody } from './Elements';
-import { InputGroup, SearchInput, ButtonPrimary, ButtonInvisible, ButtonOutline } from '../Form/Elements';
+import { InputGroup, SearchInput, ButtonPrimary, ButtonOutline } from '../Form/Elements';
 import { List, ListItem } from '../Chat/ListElements';
 import ErrorMessage from '../ErrorMessage';
 import LoadingSmall from '../LoadingSmall';
@@ -27,23 +27,12 @@ const mapDispatchToProps = (dispatch) => ({
   hideModal: () => dispatch(hideModal())
 });
 
-const AddContactModal = ({
-  existingContacts,
-  myUsername,
-  token,
-  contacts,
-  errMessage,
-  isLoading,
-  searchContacts,
-  addContact,
-  clearContactSearch,
-  hideModal
-}) => {
+const AddContactModal = ({ existingContacts, myUsername, token, contacts, errMessage,
+  isLoading, searchContacts, addContact, clearContactSearch, hideModal }) => {
 
   let searchInput;
 
   const search = () => {
-    console.log('searching for a contact', searchInput);
     if (searchInput.value && searchInput.value.length > 2)
       searchContacts(searchInput.value, token);
   };

@@ -5,11 +5,6 @@ import HeaderContainer from './HeaderContainer';
 import { ButtonInvisible } from '../Form/Elements';
 import { Dropdown, DropdownMenu, DropdownItem } from './DropdownElements';
 
-const ButtonInvisibleHideMedium = styled(ButtonInvisible)`
-  @media (min-width: 992px) {
-    display: none;
-  }
-`;
 
 const ButtonInvisibleHideSmall = styled(ButtonInvisible)`
   @media (min-width: 768px) {
@@ -17,17 +12,24 @@ const ButtonInvisibleHideSmall = styled(ButtonInvisible)`
   }
 `;
 
-const ChatHeader = ({ name, picture, logout, showModal }) => {
+const ChatHeader = ({ name, picture, logout, showModal, toggleAvailableChats, toggleContacts }) => {
+
   return (
     <HeaderContainer>
       <h3 style={{margin: '0 20px', fontWeight: 'normal'}}>{name}</h3>
       <div>
-        <ButtonInvisibleHideSmall>
+        <ButtonInvisibleHideSmall onClick={() => {
+            let chatColumn = document.getElementById('availableChats');
+            chatColumn.scrollIntoView({ behavior: 'smooth'});
+          }}>
           <FontAwesomeIcon icon='comments' className='fa-lg'/>
         </ButtonInvisibleHideSmall>
-        <ButtonInvisibleHideMedium>
+        <ButtonInvisibleHideSmall onClick={() => {
+            let contactsColumn = document.getElementById('contacts');
+            contactsColumn.scrollIntoView({ behavior: 'smooth'});
+          }}>
           <FontAwesomeIcon icon='list-ul' className='fa-lg'/>
-        </ButtonInvisibleHideMedium>
+        </ButtonInvisibleHideSmall>
         <Dropdown>
           <ButtonInvisible>
             <FontAwesomeIcon icon='cog' className='fa-lg'/>

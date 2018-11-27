@@ -1,8 +1,6 @@
 import React from 'react';
-import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Route, Redirect } from 'react-router-dom';
-import { authenticateWithToken } from '../actions/actionCreators';
 
 const mapStateToProps = (state) => {
   return {

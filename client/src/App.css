@@ -1,5 +1,7 @@
+html {
+  background: linear-gradient(#1f253d, #50597b, #11a8ab) fixed;
+}
 body {
-  background: linear-gradient(#1f253d, #50597b, #11a8ab);
   color: #9099b7;
 }
 
